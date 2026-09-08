@@ -2,163 +2,117 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse the RYNEX car catalogue — compare models, add to cart or request a quote.">
+    <link rel="icon" href="../images/logo.png">
+    <title>RYNEX | Cars</title>
     <link rel="stylesheet" href="cars.css">
-    <title>Car Shop</title>
 </head>
 <body>
     <div class="container">
-      <div class="links">
-        <h3>Car Shop</h3>
-        <a href="../Home/index.html">Home</a>
-        <a href="/Frontend/src/cars/cars.html">Cars</a>
-        <a href="/Frontend//src/features/features.html">Features</a>
-        <a href="/Frontend/src/contact-us/contactus.html">Contact Us</a>
-        <a href="/Frontend/src/about-us/aboutus.html">About Us</a>
-        <a href="../cart/cart.html" class="cart"><ion-icon name="cart-outline"></ion-icon></a>
-        <a href=""><ion-icon name="person-circle"></ion-icon></a>
-        <!-- <a href="" ><ion-icon name="search"></ion-icon></a> -->
-       
-        <!-- <div class="wrap">
-          <div class="search">
-             <input type="text" class="searchTerm" placeholder="What are you looking for?">
-             <button type="submit" class="searchButton">
-               <i class="fa fa-search"></i>
-            </button>
-          </div>
-       </div> -->
-        
-       
-      </div>
-        <div class="cars-main">
-          <div class="car">
-            <img src="../images/bmw.jpeg" alt="">
-            <br>
-            <div class="btn">
-              <button class="quote">Get a Quote</button>
-            <button class="reserve">Add To Cart</button>
+        <nav class="links" aria-label="Primary navigation">
+            <h3><img src="../images/logo.png" alt="RYNEX logo" class="links-logo">RYNEX</h3>
+            <div class="links-nav">
+                <a href="../Home/index.html">Home</a>
+                <a href="cars.html" class="active">Cars</a>
+                <a href="../features/features.html">Features</a>
+                <a href="../contact-us/contactus.html">Contact Us</a>
+                <a href="../about-us/aboutus.html">About Us</a>
             </div>
-          </div>
-          <div class="car">
-            <img src="../images/bmw.jpeg" alt="">
-            <br>
-            <div class="btn">
-              <button class="quote">Get a Quote</button>
-            <button class="reserve">Add to Cart</button>
+            <div class="links-actions">
+                <a href="../cart/cart.html" class="cart">Cart</a>
+                <a href="../login/login.html" class="account">Account</a>
             </div>
-          </div>
-          <div class="car">
-            <img src="../images/bmw.jpeg" alt="">
-            <br>
-            <div class="btn">
-              <button class="quote">Get a Quote</button>
-            <button class="reserve">Add to Cart</button>
-            </div>
-          </div>
-          <div class="car">
-            <img src="../images/bmw.jpeg" alt="">
-            <br>
-            <div class="btn">
-              <button class="quote">Get a Quote</button>
-            <button class="reserve">Add to Cart</button>
-            </div>
-          </div>
-          <div class="car">
-            <img src="../images/bmw.jpeg" alt="">
-            <br>
-            <div class="btn">
-              <button class="quote">Get a Quote</button>
-            <button class="reserve">Add to Cart</button>
-            </div>
-          </div>
-          <div class="car">
-            <img src="../images/bmw.jpeg" alt="">
-            <br>
-            <div class="btn">
-              <button class="quote">Get a Quote</button>
-            <button class="reserve">Add to Cart</button>
-            </div>
-          </div>
-          <div class="car">
-            <img src="../images/bmw.jpeg" alt="">
-            <br>
-            <div class="btn">
-              <button class="quote">Get a Quote</button>
-            <button class="reserve">Add to Cart</button>
-            </div>
-          </div>
-          <div class="car">
-            <img src="../images/bmw.jpeg" alt="">
-            <br>
-            <div class="btn">
-              <button class="quote">Get a Quote</button>
-            <button class="reserve">Add to Cart</button>
-            </div>
-          </div>
+        </nav>
 
-        </div>
+        <header class="cars-hero">
+            <h1>Find your next car</h1>
+            <p>Browse the RYNEX catalogue — add a car to your cart or request a quote.</p>
+        </header>
+
+        <section class="cars-filter" aria-label="Filter cars">
+            <div class="cars-filter-field">
+                <label for="brandFilter">Brand</label>
+                <input type="text" id="brandFilter" name="brandFilter" placeholder="e.g. Audi" autocomplete="off">
+            </div>
+            <div class="cars-filter-field">
+                <label for="bodyTypeFilter">Body type</label>
+                <select id="bodyTypeFilter" name="bodyTypeFilter">
+                    <option value="">All body types</option>
+                </select>
+            </div>
+            <button type="button" id="clearFilters" class="cars-filter-clear">Clear filters</button>
+        </section>
+
+        <p class="cars-status" id="carsStatus" hidden></p>
+        <div class="cars-grid" id="carsGrid" aria-live="polite"></div>
+
         <footer>
-          <div class="row1">
-            <img src="../images/cjrLogo.png" alt="">
-            <h2>CRJ Car Logo</h2>
-            <p>Get a car of yourself delivered at the comfort of your home. <br>
-               Order online get it at the doorstep</p>
-          </div>
-          <div class="row2">
-            <h3>We accept the following payment methods:</h3>
-            <!-- <strong>inbox incase your preffered method is not available</strong> -->
-            <img src="../images/payment/payment-1.png" alt="">
-            <img src="../images/payment/payment-2.png" alt="">
-           <img src="../images/payment/payment-3.png" alt="">
-           <img src="../images/payment/payment-4.png" alt="">
-           <img src="../images/payment/payment-5.png" alt="">
-           <!-- <img src="../images/payment/mpesa.png" alt=""> -->
-    
-          </div>
-          <div class="row3">
-            <h6>Quick links</h6>
-            <ul>
-              <li><a href="#">About</a></li>
-              <li><a href="#">Blogs</a></li>
-              <li><a href="#">Contact</a></li>
-              <li><a href="#">FAQ</a></li>
-            </ul>
-          </div>
-          <div class="row4">
-            <h6>Account</h6>
-            <ul>
-                <li><a href="#">My Account</a></li>
-                <li><a href="../orders-page/orders.html">Orders Tracking</a></li>
-                <li><a href="#">Checkout</a></li>
-                <li><a href="#">Wishlist</a></li>
-            </ul>
-          </div>
-          
+            <div class="row1">
+                <img src="../images/logo.png" alt="RYNEX logo">
+                <h2>RYNEX</h2>
+                <p>Get a car of yourself delivered at the comfort of your home. <br>
+                   Order online, get it at the doorstep</p>
+            </div>
+            <div class="row2">
+                <h3>We accept the following payment methods:</h3>
+                <img src="../images/payment/payment-1.png" alt="Payment method 1">
+                <img src="../images/payment/payment-2.png" alt="Payment method 2">
+                <img src="../images/payment/payment-3.png" alt="Payment method 3">
+                <img src="../images/payment/payment-4.png" alt="Payment method 4">
+                <img src="../images/payment/payment-5.png" alt="Payment method 5">
+            </div>
+            <div class="row3">
+                <h6>Quick links</h6>
+                <ul>
+                    <li><a href="../about-us/aboutus.html">About</a></li>
+                    <li><a href="cars.html">Cars</a></li>
+                    <li><a href="../contact-us/contactus.html">Contact</a></li>
+                    <li><a href="../features/features.html">Features</a></li>
+                </ul>
+            </div>
+            <div class="row4">
+                <h6>Account</h6>
+                <ul>
+                    <li><a href="../login/login.html">My Account</a></li>
+                    <li><a href="../cart/cart.html">Orders Tracking</a></li>
+                    <li><a href="../cart/cart.html">Checkout</a></li>
+                    <li><a href="../cart/cart.html">Cart</a></li>
+                </ul>
+            </div>
         </footer>
+
         <div class="newsletter">
-          <h4>Carshop Newsletter</h4>
-          <input type="text" placeholder="Email">
-          <button type="submit" class="site-btn" onclick="alert('Thank you!! You will be receiving updates on your email')">Subscribe</button>
+            <h4>RYNEX Newsletter</h4>
+            <input type="text" placeholder="Email" aria-label="Email address">
+            <button type="button" class="site-btn" onclick="alert('Thank you!! You will be receiving updates on your email')">Subscribe</button>
         </div>
         <div class="copyright">
-          <p>Copyright &copy;
-            <script>
-                document.write(new Date().getFullYear());
-            </script>
-            All rights reserved | This project is made with
-            <i class="fa fa-heart" aria-hidden="true"></i>
-            by
-            <a href="#" target="_blank">Christine, John & Roy</a>
-        </p>
+            <p>Copyright &copy;
+                <script>
+                    document.write(new Date().getFullYear());
+                </script>
+                All rights reserved | RYNEX — Christine, John &amp; Roy</p>
         </div>
-
     </div>
-    
 
+    <!-- Get Quote modal (filled in by cars.ts, pure DOM) -->
+    <div class="quote-modal" id="quoteModal" hidden>
+        <div class="quote-modal-backdrop" data-quote-close></div>
+        <div class="quote-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="quoteModalTitle">
+            <button type="button" class="quote-modal-close" data-quote-close aria-label="Close quote panel">&times;</button>
+            <img id="quoteModalImage" class="quote-modal-image" src="../images/logo.png" alt="">
+            <h3 class="quote-modal-title" id="quoteModalTitle"></h3>
+            <p class="quote-modal-brand" id="quoteModalBrand"></p>
+            <span class="car-badge" id="quoteModalBodyType"></span>
+            <p class="quote-modal-price" id="quoteModalPrice"></p>
+            <p class="quote-modal-note">Reserving holds this car for you — add it to the cart and our team will confirm availability and delivery.</p>
+            <button type="button" class="car-btn car-btn-add quote-modal-cta" id="quoteModalCta">Proceed to login to reserve</button>
+        </div>
+    </div>
 
-
-    <script src="https://code.iconify.design/iconify-icon/1.0.3/iconify-icon.min.js"></script>
-    <script src="../cart/cart.ts" defer></script>
+    <script src="../api/api.js"></script>
+    <script src="../api/ui.js"></script>
+    <script src="./cars.js"></script>
 </body>
 </html>
