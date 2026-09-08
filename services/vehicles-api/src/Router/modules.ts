@@ -24,7 +24,7 @@ const router = Router()
 // import passportRouter from '../Modules/Passport/passport.router'; router.use('/passport', passportRouter);
 // import intelligenceRouter from '../Modules/Intelligence/intelligence.router'; router.use('/intelligence', intelligenceRouter);
 // import partsRouter from '../Modules/Parts/parts.router'; router.use('/parts', partsRouter);
-// import serviceRouter from '../Modules/Service/service.router'; router.use('/service', serviceRouter);
+import serviceRouter from '../Modules/Service/service.router'; router.use('/service', serviceRouter);
 // import fleetRouter from '../Modules/Fleet/fleet.router'; router.use('/fleet', fleetRouter);
 // import financeRouter from '../Modules/Finance/finance.router'; router.use('/finance', financeRouter);
 // import dataRouter from '../Modules/Data/data.router'; router.use('/data', dataRouter);
