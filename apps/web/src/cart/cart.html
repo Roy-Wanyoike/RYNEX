@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Cart</title>
+    <title>RYNEX | Cart</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="cart.css">
-    <script src="products.js"></script>
-    <script src="cart.js"></script>
   </head>
   <body>
     <div class="links">
-      <h3>Car Shop</h3>
+      <h3>RYNEX</h3>
       <a href="../Home/index.html">Home</a>
-      <a href="../cart/cart.html">Cars</a>
+      <a href="../cart/cart.html">Cart</a>
       <a href="../cars/cars.html">Features</a>
       <a href="../contact-us/contactus.html">Contact Us</a>
       <a href="../about-us/aboutus.html">About Us</a>
@@ -67,5 +65,11 @@
       <button class="c-checkout cart" onclick="cart.checkout()">Checkout</button>
     </div>
     </template>
+
+    <!-- (C) SCRIPTS - api.js and ui.js must load BEFORE the page scripts -->
+    <script src="../api/api.js"></script>
+    <script src="../api/ui.js"></script>
+    <script src="./products.js"></script>
+    <script src="./cart.js"></script>
   </body>
 </html>

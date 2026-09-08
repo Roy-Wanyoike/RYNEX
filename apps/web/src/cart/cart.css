@@ -370,3 +370,16 @@ flex-direction: row;
 .product-sale img{
 height: 150px;
 }
+
+/* (D) RYNEX cart tweaks - readable text on the light cart rows.
+   The global `body { color: #fff }` rule made cart lines white-on-light. */
+.c-item, .c-total {
+  color: #111;
+}
+.c-qty {
+  color: #111;
+}
+.c-empty-note {
+  padding: 20px 10px;
+  color: #fff;
+}
