@@ -5,159 +5,157 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="RYNEX — The trust and intelligence infrastructure for mobility. Browse verified vehicles, check reputations and pay with protection.">
   <link rel="stylesheet" href="index.css">
-  <title>Home Page</title>
+  <title>RYNEX | Home</title>
 </head>
 
 <body>
   <div class="container">
-    <div class="links">
-      <h3>Car Shop</h3>
+    <nav class="links" aria-label="Primary navigation">
+      <h3>RYNEX</h3>
       <a href="../Home/index.html">Home</a>
-      <a href="../cart/cart.html">Cars</a>
-      <a href="../cars/cars.html">Features</a>
-      <a href="../contact-us/contactus.html">Contact Us</a>
+      <a href="../cars/cars.html">Browse Vehicles</a>
       <a href="../about-us/aboutus.html">About Us</a>
-      <!-- <a href="" ><ion-icon name="search"></ion-icon></a> -->
-     
-      <!-- <div class="wrap">
-        <div class="search">
-           <input type="text" class="searchTerm" placeholder="What are you looking for?">
-           <button type="submit" class="searchButton">
-             <i class="fa fa-search"></i>
-          </button>
-        </div>
-     </div> -->
-      
-      <a href="../cart/cart.html" class="cart"><ion-icon name="cart-outline"></ion-icon></a>
-      <a href=""><ion-icon name="person-circle"></ion-icon></a>
-    </div>
+      <a href="../contact-us/contactus.html">Contact Us</a>
+      <a href="../cart/cart.html" class="cart" aria-label="View your cart">
+        <ion-icon name="cart-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <a href="../login/login.html" aria-label="Log in to your RYNEX account">
+        <ion-icon name="person-circle" aria-hidden="true"></ion-icon>
+      </a>
+    </nav>
+
     <div class="intro">
       <div class="intro-slideshow">
-        <img src="../images/benz.jpeg" alt="">
-        <img src="../images/audi.jpeg" alt="">
-        <img src=".././images/audiA4.jpg" alt="">
-        <img src=".././images/audiA5.jpg" alt="">
-        <img src="../images/bmw.jpeg" alt="">
-        <img src="../images/jeep.jpg" alt="">
-        <img src="../images/mazdacx5.jpg" alt="">
-        <img src="../images/mazdamx5.jpg" alt="">
-        <img src="../images/volkswagen.png" alt="">
-        <img src="../images/volvoxc60.jpg" alt="">
+        <img src="../images/benz.jpeg" alt="Black Mercedes-Benz luxury sedan">
+        <img src="../images/audi.jpeg" alt="Audi sports car" loading="lazy">
+        <img src="../images/audiA4.jpg" alt="Silver Audi A4 sedan" loading="lazy">
+        <img src="../images/audiA5.jpg" alt="Audi A5 coupe" loading="lazy">
+        <img src="../images/bmw.jpeg" alt="BMW performance car" loading="lazy">
+        <img src="../images/jeep.jpg" alt="Jeep off-road vehicle" loading="lazy">
+        <img src="../images/mazdacx5.jpg" alt="Mazda CX-5 SUV" loading="lazy">
+        <img src="../images/mazdamx5.jpg" alt="Mazda MX-5 roadster" loading="lazy">
+        <img src="../images/volkswagen.png" alt="Volkswagen hatchback" loading="lazy">
+        <img src="../images/volvoxc60.jpg" alt="Volvo XC60 SUV" loading="lazy">
       </div>
       <div class="intro-header">
-        <h1>Get a Car of Your choice from your best car Hub</h1>
-        <p>The only trusted and verified home of cars</p>
-        <a href="../registration/registration.html">
-          <button>Get Started</button>
-        </a>
-        <a href="../contact-us/contactus.html">
-          <button>Book Demo</button>
-        </a>
+        <h1>Find a car you can trust on RYNEX</h1>
+        <p>The trust and intelligence infrastructure for mobility.</p>
+        <a href="../cars/cars.html" class="btn btn-primary">Browse vehicles</a>
+        <a href="../contact-us/contactus.html" class="btn btn-secondary">Book demo</a>
       </div>
     </div>
+
     <div class="flashsales">
-      <marquee behavior="" direction="left">
+      <marquee behavior="scroll" direction="left">
 
         <div class="product-sale">
-          <img src="../images/audiA4.jpg" alt="">
-          <h1>Audi A5 streamline</h1>
-          <h4>{{price}}</h4>
-
+          <img src="../images/audiA4.jpg" alt="Audi A4 sedan" loading="lazy">
+          <h2>Audi A4</h2>
+          <h4>Price on request</h4>
         </div>
         <div class="product-sale">
-          <img src="../images/audiA5.jpg" alt="">
-          <h1>Audi A5 streamline</h1>
-          <h4>{{price}}</h4>
-
+          <img src="../images/audiA5.jpg" alt="Audi A5 coupe" loading="lazy">
+          <h2>Audi A5</h2>
+          <h4>Price on request</h4>
         </div>
         <div class="product-sale">
-          <img src="../images/jeep.jpg" alt="">
-          <h1>Audi A5 streamline</h1>
-          <h4>{{price}}</h4>
-
+          <img src="../images/jeep.jpg" alt="Jeep off-road vehicle" loading="lazy">
+          <h2>Jeep 4x4</h2>
+          <h4>Price on request</h4>
         </div>
         <div class="product-sale">
-          <img src="../images/mazdacx5.jpg" alt="">
-          <h1>Audi A5 streamline</h1>
-          <h4>{{price}}</h4>
-
+          <img src="../images/mazdacx5.jpg" alt="Mazda CX-5 SUV" loading="lazy">
+          <h2>Mazda CX-5</h2>
+          <h4>Price on request</h4>
         </div>
         <div class="product-sale">
-          <img src="../images/mazdamx5.jpeg" alt="">
-          <h1>Audi A5 streamline</h1>
-          <h4>{{price}}</h4>
-
+          <img src="../images/mazdamx5.jpeg" alt="Mazda MX-5 roadster" loading="lazy">
+          <h2>Mazda MX-5</h2>
+          <h4>Price on request</h4>
         </div>
         <div class="product-sale">
-          <img src="../images/volkswagen.png" alt="">
-          <h1>Audi A5 streamline</h1>
-          <h4>{{price}}</h4>
-
+          <img src="../images/volkswagen.png" alt="Volkswagen hatchback" loading="lazy">
+          <h2>Volkswagen</h2>
+          <h4>Price on request</h4>
         </div>
 
       </marquee>
     </div>
+
+    <section class="protect" aria-labelledby="protect-heading">
+      <h2 id="protect-heading">How RYNEX protects buyers</h2>
+      <p class="protect-sub">Every deal on RYNEX stands on three layers of protection.</p>
+      <div class="protect-cards">
+        <a class="protect-card" href="../about-us/aboutus.html">
+          <h3>Verified identity</h3>
+          <p>Every seller and buyer is ID-verified before they can trade, backed by the Rynex Passport.</p>
+          <span class="protect-cta">Learn about Rynex Passport &rarr;</span>
+        </a>
+        <a class="protect-card" href="../about-us/aboutus.html">
+          <h3>Reputation</h3>
+          <p>Transparent ratings and reviews give every trader a trust record you can check before you commit, powered
+            by Rynex Trust.</p>
+          <span class="protect-cta">Learn about Rynex Trust &rarr;</span>
+        </a>
+        <a class="protect-card" href="../about-us/aboutus.html">
+          <h3>Protected payments</h3>
+          <p>Your money is held securely and only released when the vehicle is delivered as described, through Rynex
+            Finance.</p>
+          <span class="protect-cta">Learn about Rynex Finance &rarr;</span>
+        </a>
+      </div>
+    </section>
+
     <footer>
       <div class="row1">
-        <img src="../images/cjrLogo.png" alt="">
-        <h2>CRJ Car Logo</h2>
-        <p>Get a car of yourself delivered at the comfort of your home. <br>
-           Order online get it at the doorstep</p>
+        <img src="../images/cjrLogo.png" alt="RYNEX logo" loading="lazy">
+        <h2>RYNEX</h2>
+        <p>The trust and intelligence infrastructure for mobility. <br>
+          Order online and get your car delivered at the comfort of your home.</p>
       </div>
       <div class="row2">
         <h3>We accept the following payment methods:</h3>
-        <!-- <strong>inbox incase your preffered method is not available</strong> -->
-        <img src="../images/payment/payment-1.png" alt="">
-        <img src="../images/payment/payment-2.png" alt="">
-       <img src="../images/payment/payment-3.png" alt="">
-       <img src="../images/payment/payment-4.png" alt="">
-       <img src="../images/payment/payment-5.png" alt="">
-       <!-- <img src="../images/payment/mpesa.png" alt=""> -->
-
+        <img src="../images/payment/payment-1.png" alt="Accepted payment method logo" loading="lazy">
+        <img src="../images/payment/payment-2.png" alt="Accepted payment method logo" loading="lazy">
+        <img src="../images/payment/payment-3.png" alt="Accepted payment method logo" loading="lazy">
+        <img src="../images/payment/payment-4.png" alt="Accepted payment method logo" loading="lazy">
+        <img src="../images/payment/payment-5.png" alt="Accepted payment method logo" loading="lazy">
       </div>
       <div class="row3">
         <h6>Quick links</h6>
         <ul>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Blogs</a></li>
-          <li><a href="#">Contact</a></li>
-          <li><a href="#">FAQ</a></li>
+          <li><a href="../about-us/aboutus.html">About Us</a></li>
+          <li><a href="../cars/cars.html">Browse Vehicles</a></li>
+          <li><a href="../contact-us/contactus.html">Contact Us</a></li>
+          <li><a href="../registration/registration.html">Create Account</a></li>
         </ul>
       </div>
       <div class="row4">
         <h6>Account</h6>
         <ul>
-            <li><a href="#">My Account</a></li>
-            <li><a href="../orders-page/orders.html">Orders Tracking</a></li>
-            <li><a href="#">Checkout</a></li>
-            <li><a href="#">Wishlist</a></li>
+          <li><a href="../login/login.html">My Account</a></li>
+          <li><a href="../cart/cart.html">Cart</a></li>
+          <li><a href="../registration/registration.html">Register</a></li>
         </ul>
       </div>
-      
+
     </footer>
     <div class="newsletter">
-      <h4>Carshop Newsletter</h4>
-      <input type="text" placeholder="Email">
-      <button type="submit" class="site-btn" onclick="alert('Thank you!! You will be receiving updates on your email')">Subscribe</button>
+      <h4>RYNEX Newsletter</h4>
+      <input type="email" id="newsletter-email" placeholder="Email" aria-label="Email address">
+      <button type="button" id="newsletter-btn" class="site-btn">Subscribe</button>
     </div>
     <div class="copyright">
-      <p>Copyright &copy;
-        <script>
-            document.write(new Date().getFullYear());
-        </script>
-        All rights reserved | This project is made with
-        <i class="fa fa-heart" aria-hidden="true"></i>
-        by
-        <a href="#" target="_blank">Christine, John & Roy</a>
-    </p>
+      <p>Copyright &copy; <span id="year"></span> RYNEX. All rights reserved. Made with &hearts; by Christine, John
+        &amp; Roy.</p>
     </div>
   </div>
   <script src="../Home/index.js"></script>
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 
 </html>
