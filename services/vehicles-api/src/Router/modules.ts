@@ -27,7 +27,11 @@ import partsRouter from '../Modules/Parts/parts.router'; router.use('/parts', pa
 // import serviceRouter from '../Modules/Service/service.router'; router.use('/service', serviceRouter);
 import fleetRouter from '../Modules/Fleet/fleet.router'; router.use('/fleet', fleetRouter);
 // import financeRouter from '../Modules/Finance/finance.router'; router.use('/finance', financeRouter);
+<<<<<<< HEAD
 // import dataRouter from '../Modules/Data/data.router'; router.use('/data', dataRouter);
 >>>>>>> feat/parts
+=======
+import dataRouter from '../Modules/Data/data.router'; router.use('/data', dataRouter);
+>>>>>>> feat/data
 
 export default router
