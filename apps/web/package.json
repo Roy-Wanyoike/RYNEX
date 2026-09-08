@@ -1,0 +1,13 @@
+{
+  "name": "rynex-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "4.9.5"
+  }
+}
