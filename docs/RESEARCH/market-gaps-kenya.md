@@ -5,6 +5,7 @@
 | **Doc** | `docs/RESEARCH/market-gaps-kenya.md` |
 | **Task ID** | A-3 (Research Expert — Market Gaps) |
 | **Scope** | Kenya used-vehicle market: size/shape, policy context, pain-point evidence, gap synthesis |
+| **Companion** | [`competitive-landscape.md`](competitive-landscape.md) — competitor profiles, positioning map, RYNEX win-argument & honest risks (closes the "who else could close these gaps" question) |
 | **Method** | Web research (news, regulators, market reports, industry bodies), 2023–2026 sources preferred. Claims without a public source are flagged **[knowledge-based — verify before publishing]**. |
 | **Framing** | RYNEX = trust & intelligence infrastructure for mobility. Core principle: *"Don't ask buyers to trust the seller. Give buyers evidence."* |
 
