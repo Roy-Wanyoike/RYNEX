@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Cart</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="cart.css">
+    <script src="products.js"></script>
+    <script src="cart.js"></script>
+  </head>
+  <body>
+    <div class="links">
+      <h3>Car Shop</h3>
+      <a href="../Home/index.html">Home</a>
+      <a href="../cart/cart.html">Cars</a>
+      <a href="../cars/cars.html">Features</a>
+      <a href="../contact-us/contactus.html">Contact Us</a>
+      <a href="../about-us/aboutus.html">About Us</a>
+      <!-- <a href="" ><ion-icon name="search"></ion-icon></a> -->
+     
+      <!-- <div class="wrap">
+        <div class="search">
+           <input type="text" class="searchTerm" placeholder="What are you looking for?">
+           <button type="submit" class="searchButton">
+             <i class="fa fa-search"></i>
+          </button>
+        </div>
+     </div> -->
+      
+      <a href="../cart/cart.html" class="cart"><ion-icon name="cart-outline"></ion-icon></a>
+      <a href=""><ion-icon name="person-circle"></ion-icon></a>
+    </div>
+    <!-- (A) CART -->
+    <div id="cart-wrap">
+      <!-- (A1) PRODUCTS LIST -->
+      <div id="cart-products"></div>
+
+      <!-- (A2) CURRENT CART ITEMS -->
+      <div id="cart-items"></div>
+    </div>
+
+    <!-- (B) TEMPLATES -->
+    <!-- (B1) PRODUCT CELL -->
+    <template id="template-product">
+    <div class="p-item">
+      <img class="p-img">
+      <div class="p-info">
+        <div class="p-txt">
+          <div class="p-name"></div>
+          <div class="p-price"></div>
+        </div>
+        <button class="cart p-add">Add to Cart</button>
+      </div>
+    </div>
+    </template>
+
+    <!-- (B2) CART ITEMS -->
+    <template id="template-cart">
+    <div class="c-item">
+      <input class="c-qty" type="number" min="0">
+      <div class="c-name"></div>
+      <button class="c-del cart">Delete</button>
+    </div>
+    </template>
+    <template id="template-cart-checkout">
+    <div class="c-go">
+      <button class="c-empty cart" onclick="cart.nuke()">Empty</button>
+      <button class="c-checkout cart" onclick="cart.checkout()">Checkout</button>
+    </div>
+    </template>
+  </body>
+</html>

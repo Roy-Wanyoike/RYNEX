@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <link rel="stylesheet" href="registration.css">
+</head>
+<body> 
+    <h1>REGISTRATION</h1> <br>
+    <form action="" class="row" id="UserForm">
+
+
+        <div class="column">
+        <label for="username">UserName</label>
+        <input type="text" id="username">
+
+        <label for="phone">Phone</label>
+        <input type="text" id="phone">
+
+        <label for="password">Password</label>
+        <input type="password" id="pass">
+
+        <label for="address">Address</label>
+        <input type="text" id="address">
+
+        </div>
+        
+        <div class="column">
+            <label for="fullname">Full Names</label>
+        <input type="text" id="fullname">
+
+        <label for="emailAddress">Email address</label>
+        <input type="text" id="emailAddress">
+
+        <label for="cpassword">Confirm Password</label>
+        <input type="password" id="cpass">
+
+        <label for="country">Country</label>
+        <input type="text" id="country">
+        </div>
+
+     </form>
+     <p>Have an Account ?  <a href="../Home/index.html"><button>Login</button></a> </p> <br>
+
+     
+        <button class="reg"  onclick="alert('User registered successfully')"href="../Home/index.html">REGISTER</button>
+        <script src="../../dist/Admin/addUser.js" defer></script>
+</body>
+</html>

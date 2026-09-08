@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <title>Home Page</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="links">
+      <h3>Car Shop</h3>
+      <a href="../Home/index.html">Home</a>
+      <a href="../cart/cart.html">Cars</a>
+      <a href="../cars/cars.html">Features</a>
+      <a href="../contact-us/contactus.html">Contact Us</a>
+      <a href="../about-us/aboutus.html">About Us</a>
+      <!-- <a href="" ><ion-icon name="search"></ion-icon></a> -->
+     
+      <!-- <div class="wrap">
+        <div class="search">
+           <input type="text" class="searchTerm" placeholder="What are you looking for?">
+           <button type="submit" class="searchButton">
+             <i class="fa fa-search"></i>
+          </button>
+        </div>
+     </div> -->
+      
+      <a href="../cart/cart.html" class="cart"><ion-icon name="cart-outline"></ion-icon></a>
+      <a href=""><ion-icon name="person-circle"></ion-icon></a>
+    </div>
+    <div class="intro">
+      <div class="intro-slideshow">
+        <img src="../images/benz.jpeg" alt="">
+        <img src="../images/audi.jpeg" alt="">
+        <img src=".././images/audiA4.jpg" alt="">
+        <img src=".././images/audiA5.jpg" alt="">
+        <img src="../images/bmw.jpeg" alt="">
+        <img src="../images/jeep.jpg" alt="">
+        <img src="../images/mazdacx5.jpg" alt="">
+        <img src="../images/mazdamx5.jpg" alt="">
+        <img src="../images/volkswagen.png" alt="">
+        <img src="../images/volvoxc60.jpg" alt="">
+      </div>
+      <div class="intro-header">
+        <h1>Get a Car of Your choice from your best car Hub</h1>
+        <p>The only trusted and verified home of cars</p>
+        <a href="../registration/registration.html">
+          <button>Get Started</button>
+        </a>
+        <a href="../contact-us/contactus.html">
+          <button>Book Demo</button>
+        </a>
+      </div>
+    </div>
+    <div class="flashsales">
+      <marquee behavior="" direction="left">
+
+        <div class="product-sale">
+          <img src="../images/audiA4.jpg" alt="">
+          <h1>Audi A5 streamline</h1>
+          <h4>{{price}}</h4>
+
+        </div>
+        <div class="product-sale">
+          <img src="../images/audiA5.jpg" alt="">
+          <h1>Audi A5 streamline</h1>
+          <h4>{{price}}</h4>
+
+        </div>
+        <div class="product-sale">
+          <img src="../images/jeep.jpg" alt="">
+          <h1>Audi A5 streamline</h1>
+          <h4>{{price}}</h4>
+
+        </div>
+        <div class="product-sale">
+          <img src="../images/mazdacx5.jpg" alt="">
+          <h1>Audi A5 streamline</h1>
+          <h4>{{price}}</h4>
+
+        </div>
+        <div class="product-sale">
+          <img src="../images/mazdamx5.jpeg" alt="">
+          <h1>Audi A5 streamline</h1>
+          <h4>{{price}}</h4>
+
+        </div>
+        <div class="product-sale">
+          <img src="../images/volkswagen.png" alt="">
+          <h1>Audi A5 streamline</h1>
+          <h4>{{price}}</h4>
+
+        </div>
+
+      </marquee>
+    </div>
+    <footer>
+      <div class="row1">
+        <img src="../images/cjrLogo.png" alt="">
+        <h2>CRJ Car Logo</h2>
+        <p>Get a car of yourself delivered at the comfort of your home. <br>
+           Order online get it at the doorstep</p>
+      </div>
+      <div class="row2">
+        <h3>We accept the following payment methods:</h3>
+        <!-- <strong>inbox incase your preffered method is not available</strong> -->
+        <img src="../images/payment/payment-1.png" alt="">
+        <img src="../images/payment/payment-2.png" alt="">
+       <img src="../images/payment/payment-3.png" alt="">
+       <img src="../images/payment/payment-4.png" alt="">
+       <img src="../images/payment/payment-5.png" alt="">
+       <!-- <img src="../images/payment/mpesa.png" alt=""> -->
+
+      </div>
+      <div class="row3">
+        <h6>Quick links</h6>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blogs</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="row4">
+        <h6>Account</h6>
+        <ul>
+            <li><a href="#">My Account</a></li>
+            <li><a href="../orders-page/orders.html">Orders Tracking</a></li>
+            <li><a href="#">Checkout</a></li>
+            <li><a href="#">Wishlist</a></li>
+        </ul>
+      </div>
+      
+    </footer>
+    <div class="newsletter">
+      <h4>Carshop Newsletter</h4>
+      <input type="text" placeholder="Email">
+      <button type="submit" class="site-btn" onclick="alert('Thank you!! You will be receiving updates on your email')">Subscribe</button>
+    </div>
+    <div class="copyright">
+      <p>Copyright &copy;
+        <script>
+            document.write(new Date().getFullYear());
+        </script>
+        All rights reserved | This project is made with
+        <i class="fa fa-heart" aria-hidden="true"></i>
+        by
+        <a href="#" target="_blank">Christine, John & Roy</a>
+    </p>
+    </div>
+  </div>
+  <script src="../Home/index.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>

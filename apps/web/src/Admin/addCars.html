@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Box icons -->
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="admin.css">
+
+    <title>Admin Dashboard</title>
+</head>
+
+<body>
+
+
+    <!-- SIDEBAR -->
+    <section id="sidebar">
+        <a href="#" class="brand">
+            <span class="text">Admin Dashboard</span>
+        </a>
+        <ul class="side-menu top">
+            <li class="active">
+                <a href="admin.html">
+                    <i class='bx bxs-dashboard'></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="addCars.html">
+                    <i class='bx bxs-shopping-bag-alt'></i>
+                    <span class="text">Add Cars</span>
+                </a>
+            </li>
+            <li>
+                <a href="addUser.html" target="_self">
+                    <i class='bx bxs-doughnut-chart'></i>
+                    <span class="text">Add users</span>
+                </a>
+            </li>
+            <li>
+                <a href="../Admin/order.html">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="text">Orders</span>
+                </a>
+            </li>
+
+        </ul>
+    </section>
+
+    <section id="content">
+
+        <nav>
+            <i class='bx bx-menu' style="color: white;"></i>
+
+            <form action="#">
+                <div class="form-input">
+                    <input type="search" id="searchCars" placeholder="Search...">
+                    <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
+                </div>
+            </form>
+            </a>
+
+        </nav>
+
+        <main>
+            <div class="addUser">
+                <h2>Add Cars</h2> <br>
+                <form action="" class="row" id="formCars">
+
+
+                    <div class="column">
+                        <label for="model">Car Model</label>
+                        <input type="text" id="carModel">
+
+                        <label for="bodytype">Body Type</label>
+                        <input type="text" id="bodyType">
+
+                        <label for="brand">Brand</label>
+                        <input type="text" id="brand">
+
+                        <label for="price">Price</label>
+                        <input type="text" id="price">
+
+                        <label for="picture">Picture</label>
+                        <input type="file" id="image">
+
+                    </div>
+
+                </form>
+                <Button class="reg" id="addCarBtn">Add Car</Button>
+                <Button class="delete" id="delCar">Delete</Button>
+            </div>
+        </main>
+    </section>
+    <script src="../../dist/Admin/addCars.js"></script>
+</body>
+</html>

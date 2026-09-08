@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Box icons -->
+        <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+        <link rel="stylesheet" href="admin.css">
+
+        <title>Admin Dashboard</title>
+</head>
+<body>
+
+
+        <!-- SIDEBAR -->
+        <section id="sidebar">
+                <a href="#" class="brand">
+                        <span class="text">Admin Dashboard</span>
+                </a>
+                <ul class="side-menu top">
+                        <li class="active">
+                                <a href="admin.html">
+                                        <i class='bx bxs-dashboard' ></i>
+                                        <span class="text">Dashboard</span>
+                                </a>
+                        </li>
+                        <li>
+                                <a href="addCars.html">
+                                        <i class='bx bxs-shopping-bag-alt' ></i>
+                                        <span class="text">Add Cars</span>
+                                </a>
+                        </li>
+                        <li>
+                                <a href="addUser.html" target="_self">
+                                        <i class='bx bxs-doughnut-chart' ></i>
+                                        <span class="text">Add users</span>
+                                </a>
+                        </li>
+                        <li>
+                                <a href="#">
+                                        <i class='bx bxs-message-dots' ></i>
+                                        <span class="text">Orders</span>
+                                </a>
+                        </li>
+
+                </ul>
+        </section>
+
+        <section id="content">
+
+                <nav>
+                        <i class='bx bx-menu' style="color: white;"></i>
+
+                        <form action="#">
+                                <div class="form-input">
+                                        <input type="search" placeholder="Search...">
+                                        <button type="submit" class="search-btn"><i class='bx bx-search' ></i></button>
+                                </div>
+                        </form>
+
+                </nav>
+
+                <main>
+         <div class="addUser">
+           <h1>Add Users</h1> <br>
+            <form action="" class="row" id="UserForm" novalidate>
+
+
+        <div class="column">
+        <label for="username">UserName</label>
+        <input type="text" id="username" name="username" autocomplete="username" required>
+
+        <label for="phone">Phone</label>
+        <input type="text" id="phone" name="phone" autocomplete="tel">
+
+        <label for="pass">Password</label>
+        <input type="password" id="pass" name="pass" autocomplete="new-password" required>
+
+        <label for="address">Address</label>
+        <input type="text" id="address" name="address" autocomplete="street-address">
+
+        </div>
+
+        <div class="column">
+            <label for="fullname">Full Names</label>
+        <input type="text" id="fullname" name="fullname" autocomplete="name">
+
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" autocomplete="email" required>
+
+        <label for="cpass">Confirm Password</label>
+        <input type="password" id="cpass" name="cpass" autocomplete="new-password" required>
+
+        <label for="country">Country</label>
+        <input type="text" id="country" name="country" autocomplete="country-name">
+        </div>
+
+     </form>
+        <button class="reg" id="addbtn" type="submit" form="UserForm">REGISTER</button>
+        <!-- No DELETE /users endpoint exists yet, so this stays disabled (see addUser.ts). -->
+        <button class="delete" id="delbtn" type="button" disabled title="Not implemented yet">Delete</button>
+
+        <h2>Registered Users</h2>
+        <div class="table-data">
+                <div class="order">
+                        <table id="userList"></table>
+                </div>
+        </div>
+
+     </div>
+     </main>
+    </section>
+        <script src="../api/api.js"></script>
+        <script src="../api/ui.js"></script>
+        <script src="./addUser.js"></script>
+</body>
+</html>

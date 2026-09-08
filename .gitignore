@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment & secrets — NEVER commit real credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Frontend compiled artifacts (TS compiled in place) — keep hand-written JS sources
+apps/web/src/**/*.js
+!apps/web/src/Home/index.js
+!apps/web/src/Admin/script.js
+!apps/web/src/cart/cart.js
+!apps/web/src/cart/products.js
+!apps/web/src/api/api.js
+!apps/web/src/api/ui.js
+
+# Test artifacts
+coverage/

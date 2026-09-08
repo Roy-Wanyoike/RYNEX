@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Box icons -->
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="admin.css">
+
+    <title>Cart Orders (All Users)</title>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <section id="sidebar">
+        <a href="#" class="brand">
+            <span class="text">Admin Dashboard</span>
+        </a>
+        <ul class="side-menu top">
+            <li>
+                <a href="admin.html">
+                    <i class='bx bxs-dashboard'></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="addCars.html">
+                    <i class='bx bxs-shopping-bag-alt'></i>
+                    <span class="text">Add Cars</span>
+                </a>
+            </li>
+            <li>
+                <a href="addUser.html" target="_self">
+                    <i class='bx bxs-doughnut-chart'></i>
+                    <span class="text">Add users</span>
+                </a>
+            </li>
+            <li class="active">
+                <a href="../Admin/order.html">
+                    <i class='bx bxs-doughnut-circle'></i>
+                    <span class="text">Orders</span>
+                </a>
+            </li>
+            <li>
+                <a href="../Home/index.html">
+                    <i class='bx bxs-doughnut-circle'></i>
+                    <span class="text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </section>
+
+    <section id="content">
+
+        <nav>
+            <i class='bx bx-menu' style="color: white;"></i>
+
+            <form action="#">
+                <div class="form-input">
+                    <input type="search" placeholder="Search...">
+                    <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
+                </div>
+            </form>
+        </nav>
+
+        <main>
+
+            <div class="table-data">
+                <div class="order">
+                    <div class="head">
+                        <h3>Cart Orders (All Users)</h3>
+                        <button type="button" id="refreshBtn" class="reg"
+                                style="width: auto; height: auto; margin: 0; padding: 8px 18px;">Refresh</button>
+                    </div>
+                    <table id="cart-orders-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Car</th>
+                                <th>Brand</th>
+                                <th>Unit Price</th>
+                                <th>Qty</th>
+                                <th>Line Total</th>
+                                <th>Card ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-table-data">
+                            <!-- Rows are rendered by order.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </section>
+
+    <script src="script.js"></script>
+    <script src="../api/api.js"></script>
+    <script src="../api/ui.js"></script>
+    <script src="./order.js"></script>
+</body>
+</html>

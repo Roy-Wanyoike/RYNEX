@@ -1,0 +1,212 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+  }
+  .container {
+    /* display: flex; */
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    /* background-color: red; */
+  }
+  .header {
+    display: flex;
+    flex-direction: row;
+  }
+  .nav-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    /* background-color: black; */
+  }
+  .nav-bar > .logo {
+    display: flex;
+    justify-self: flex-start;
+  
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+    font-size: 20px;
+  }
+  
+  .nav-bar > .links > a {
+    text-decoration: none;
+    color: black;
+    margin-left: 90px;
+  }
+  .nav-bar iconify-icon {
+    margin-left: 90px;
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .search {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    left: 1060px;
+    top: 38px;
+  }
+  
+  .cart-shop {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    left: 1167px;
+    top: 40px;
+  }
+  .profile-icon {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    left: 1274px;
+    top: 38px;
+  }
+  .main img {
+    height: 100% !important;
+    width: 100%;
+    display: block;
+    /* background-size: contain; */
+    /* overflow: hidden; */
+  }
+  .main {
+    height: 92% !important;
+  }
+  
+  /* Cars Page CSS */
+  .cars-main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .car {
+  }
+  .quote {
+    font-weight: bolder;
+    background-color: red;
+    color: white;
+    font-weight: bolder;
+    border-radius: 5px;
+    height: 40px;
+    width: 50%;
+    padding: auto;
+  }
+  .reserve {
+    background-color: black;
+    color: white;
+    font-weight: bolder;
+    border-radius: 5px;
+    height: 40px;
+    width: 50%;
+    padding: auto;
+  }
+  .btn {
+    text-align: center;
+    display: flex;
+    justify-content: space-around;
+  }
+  .btn > button {
+    margin: 10px;
+  }
+  .inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 8px;
+  
+    position: absolute;
+    width: 629px;
+    height: 368px;
+    left: 85px;
+    top: 62px;
+  }
+   form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    box-shadow: gray;
+  } 
+  form input {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 0px;
+    gap: 12px;
+    width: 548px;
+    height: 55px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  .container2 {
+   
+   width: 98vw;
+   height: 100%;
+     display: flex;
+    justify-content: space-evenly;
+    background: #ffffff;
+  }
+  #image1 {
+    height: 40px;
+    width: fit-content;
+  }
+  .forminputs{
+    display: flex;
+    flex-direction: column;
+  }
+  select{
+    width: 15%;
+    border: none;
+  }
+  
+  .details{
+    margin-top: 50px;
+    flex-direction: column;
+    gap: 10px;
+    /* border: 2px solid blue; */
+  }
+  
+  .whatsapp{
+    display: flex;
+    flex-direction: row;
+  }
+  .email{
+    display: flex;
+    flex-direction: row;
+  }
+  #image2{
+    height:40px;
+    width: 40px;
+  }
+  
+  input{
+    border: none;
+    border-bottom: 1px solid black;
+    gap: 5rem;
+  }
+  .reg{
+    background-color: red;
+    align-items: center;
+    width: 50%;
+    height: 40px;
+    margin-left: 40%;
+    border: none;
+  }
+  h1{
+    margin-top: 5rem;
+    margin-left: 45%;
+  }
+  p {
+    margin-top: 20px;
+    margin-left: 45%;
+  }
+  .row{
+    margin-top: 5rem;
+    margin-left: 15%;
+    display: flex;
+    flex-direction: row;
+    gap: 3rem;
+  }

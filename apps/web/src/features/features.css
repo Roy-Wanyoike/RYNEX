@@ -1,0 +1,50 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+  }
+  .container {
+    width: 100vw;
+    height: 100vh;
+    padding: 30px;
+  }
+  .links{
+    display: flex;
+    height: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    justify-content: space-between;
+    
+  } 
+  .link h3{
+    font-size: 20px;
+    font-weight: bold;
+    
+  }
+  .link a{
+    gap: 100px;
+  }
+/* Cars Body */
+
+  .cars-main {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .car {
+    height: 400px;
+    width: 400px;
+
+  }
+  .cars-main button {
+    border-radius: 5px;
+    background-color: transparent;
+    color: black;
+  }
+  .btn {
+    padding: 20px;
+    margin: 10px;
+   
+  }
+
+  /*  */

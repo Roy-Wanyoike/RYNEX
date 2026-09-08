@@ -1,0 +1,155 @@
+<%#
+  Welcome / confirm-email template.
+  Locals: userName (required), logoUrl (optional, absolute URL via APP_LOGO_URL),
+  appUrl (optional, absolute base URL used for the confirm link).
+  Email-client-safe: inline CSS only, no relative image paths (email clients
+  cannot load them) — the logo is only rendered when an absolute logoUrl is
+  provided.
+%>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tbody>
+    <tr>
+      <td width="100%">
+        <div style="max-width:600px;Margin:0 auto">
+          <table
+            align="center"
+            cellpadding="0"
+            cellspacing="0"
+            style="border-spacing:0;font-family:Helvetica,Arial,sans-serif;Margin:0 auto;padding:24px;width:100%;max-width:500px"
+          >
+            <tbody>
+              <% if (typeof logoUrl !== 'undefined' && logoUrl) { %>
+              <tr>
+                <td>
+                  <table style="margin-bottom:40px;width:100%" width="100%">
+                    <tbody>
+                      <tr>
+                        <td>
+                          <img
+                            src="<%= logoUrl %>"
+                            alt="logo"
+                            style="display:block"
+                            width="200"
+                            height="65"
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <% } %>
+              <tr>
+                <td style="text-align:justify;word-break:break-word">
+                  <table style="margin-bottom:20px;width:100%" width="100%">
+                    <tbody>
+                      <tr>
+                        <td>
+                          <table
+                            style="width:100%;margin-bottom:20px"
+                            width="100%"
+                            cellpadding="0"
+                            cellspacing="0"
+                          >
+                            <tbody>
+                              <tr>
+                                <td>
+                                  <strong style="font-family:Helvetica,Arial,sans-serif;color:#234567">Hi <%= userName %>, </strong>
+                                  <h1
+                                    style="font-size:26px;line-height:30px;color:#054752;word-break:normal"
+                                  >
+                                    Welcome to Car Shop! We are happy to have you!! Please confirm your email.
+                                  </h1>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td>
+                          <center>
+                            <table
+                              style="background-color:#fff;margin-bottom:20px;table-layout:fixed"
+                              align="center"
+                              width=""
+                              cellspacing="0"
+                              cellpadding="0"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    style="background-color:#00aff5;color:#fff;text-align:center;border-radius:48px;padding:16px 24px;border-color:transparent;font-weight:bold;font-size:16px;line-height:1"
+                                  >
+                                    <% if (typeof appUrl !== 'undefined' && appUrl) { %>
+                                      <a href="<%= appUrl %>" style="color:#ffffff;text-decoration:none"> Confirm Email </a>
+                                    <% } else { %>
+                                      Confirm Email
+                                    <% } %>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </center>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+              </tr>
+              <tr>
+                <td>
+                  <table width="100%" style="margin-bottom:20px;width:100%">
+                    <tbody>
+                      <tr>
+                        <td width="100%">
+                          <div
+                            style="width:100%;height:1px;background-color:#ddd"
+                            color="#DDD"
+                            width="100%"
+                          ></div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align:center;font-size:13px">
+                  <span style="color:#00aff5;font-weight:bold">Car Shop</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align:center">
+                  <table
+                    style="max-width:100%;width:100%;text-align:center;font-family:Helvetica,Arial,sans-serif"
+                    cellspacing="0"
+                    cellpadding="0"
+                  >
+                    <tbody>
+                      <tr>
+                        <td style="text-align:center">
+                          <p
+                            style="font-size:10px;color:#708c91;text-align:center;padding:0;margin-top:10px;margin-bottom:2px"
+                          >
+                            This email was sent to you by
+                            Car Shop (Do not reply)
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
