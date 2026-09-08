@@ -109,7 +109,7 @@ PRINT N'=== CARSHOP DB bootstrap: done (tables + procedures + seed) ===';
 -- Module owners: uncomment exactly your own line below.
 -- ============================================================
 -- :r $(ScriptPath)\extensions\trust.sql
--- :r $(ScriptPath)\extensions\passport.sql
+:r $(ScriptPath)\extensions\passport.sql
 -- :r $(ScriptPath)\extensions\intelligence.sql
 -- :r $(ScriptPath)\extensions\parts.sql
 -- :r $(ScriptPath)\extensions\service.sql

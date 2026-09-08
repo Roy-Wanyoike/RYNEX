@@ -21,7 +21,7 @@ const router = Router()
 // --- RYNEX MODULE REGISTRY (one line per module — uncomment to activate) ---
 
 // import trustRouter from '../Modules/Trust/trust.router'; router.use('/trust', trustRouter);
-// import passportRouter from '../Modules/Passport/passport.router'; router.use('/passport', passportRouter);
+import passportRouter from '../Modules/Passport/passport.router'; router.use('/passport', passportRouter);
 // import intelligenceRouter from '../Modules/Intelligence/intelligence.router'; router.use('/intelligence', intelligenceRouter);
 // import partsRouter from '../Modules/Parts/parts.router'; router.use('/parts', partsRouter);
 // import serviceRouter from '../Modules/Service/service.router'; router.use('/service', serviceRouter);
