@@ -114,6 +114,6 @@ PRINT N'=== CARSHOP DB bootstrap: done (tables + procedures + seed) ===';
 -- :r $(ScriptPath)\extensions\parts.sql
 :r $(ScriptPath)\extensions\service.sql
 -- :r $(ScriptPath)\extensions\fleet.sql
--- :r $(ScriptPath)\extensions\finance.sql
+:r $(ScriptPath)\extensions\finance.sql
 -- :r $(ScriptPath)\extensions\data.sql
 GO
