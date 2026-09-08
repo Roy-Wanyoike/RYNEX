@@ -3,16 +3,18 @@
 > The honest map. Spec sections refer to the product spec (*CarTrust Kenya — Vehicle
 > Commerce & Trust Infrastructure*, sections `Spec §N`). Statuses below are audited
 > against the repository: `✅`/`🟡` claims were verified by reading the cited code on
-> `main` (commit `b2dbcf2`) plus the sprint's parallel module PRs.
+> `main` after the platform-module merge (8 module PRs **#35–#42**, contract tests
+> **#43**, and the OpenAPI gateway contract).
 
 **Status legend**
 
 | Symbol | Meaning |
 |---|---|
 | ✅ | **Shipped in repo** — code on `main`, verified by reading it |
-| 🔵 | **Module shipped this sprint** — parallel PR landing now (Trust, Passport, Intelligence, Parts, Service, Fleet, Finance, Data); follows the `src/Modules/<Name>/` + `database/extensions/<name>.sql` convention in `Router/modules.ts` |
 | 🟡 | **Designed, pending** — specified, with some groundwork/scaffold in the repo (schema slot, module hook, partial capability) |
 | ⚪ | **Not started** — specified only; no code in the repo yet |
+
+*(The 🔵 "module shipped this sprint" marker is retired: all 8 platform modules — Trust, Passport, Intelligence, Parts, Service, Fleet, Finance, Data — merged to `main` via PRs #35–#42 and are now plain ✅ entries.)*
 
 ---
 
@@ -54,9 +56,9 @@
 
 | Capability | Spec | Status | Where in repo | Notes |
 |---|---|---|---|---|
-| Vehicle identity (VIN/chassis/engine/reg) | §14 | 🔵 | Sprint Passport PR (`src/Modules/Passport/`, `database/extensions/passport.sql`) | Identity fields captured with the vehicle record |
+| Vehicle identity (VIN/chassis/engine/reg) | §14 | ✅ | Passport module (`src/Modules/Passport/`, `database/extensions/passport.sql`) | Identity fields captured with the vehicle record |
 | Identity confidence scoring | §14 | 🟡 | Passport module groundwork | Spec'd (e.g. 98/100); scoring not in module scope yet |
-| Provenance event timeline | §16 | 🔵 | Sprint Passport PR | Append-only events; corrections create new events, no destructive edits |
+| Provenance event timeline | §16 | ✅ | Passport module | Append-only events; corrections create new events, no destructive edits |
 | Passport assembly (identity + ownership + inspection + service + trust) | §15 | 🟡 | Passport module + Trust/Service modules | Timelines exist; VERIFIED/SELLER_DECLARED/… evidence-grade labelling pending |
 | Vehicle QR identity | §62 | ⚪ | — | |
 | Public (shareable) vehicle passport page | §63 | ⚪ | — | UX incl. timeline is designed in spec |
@@ -65,10 +67,10 @@
 
 | Capability | Spec | Status | Where in repo | Notes |
 |---|---|---|---|---|
-| Seller profiles | §20 | 🔵 | Sprint Trust PR (`src/Modules/Trust/`, `database/extensions/trust.sql`) | Profile + verification fields |
-| Trust score (heuristic) | §45 | 🔵 | Sprint Trust PR | Explainable component scores (seller/identity/ownership/…) are the follow-up |
-| Ratings | §40, §45 | 🔵 | Sprint Trust PR | Verified-transaction-only weighting not yet enforced |
-| Leaderboard | §45 | 🔵 | Sprint Trust PR | |
+| Seller profiles | §20 | ✅ | Trust module (`src/Modules/Trust/`, `database/extensions/trust.sql`) | Profile + verification fields |
+| Trust score (heuristic) | §45 | ✅ | Trust module | Explainable component scores (seller/identity/ownership/…) are the follow-up |
+| Ratings | §40, §45 | ✅ | Trust module | Verified-transaction-only weighting not yet enforced |
+| Leaderboard | §45 | ✅ | Trust module | |
 | Seller verification levels (identity/phone/business/location/ownership) | §20 | 🟡 | Trust module groundwork | Document-checked verification is a **Next** deliverable |
 | Trust levels (`UNVERIFIED → PARTIALLY_VERIFIED → VERIFIED → HIGH_CONFIDENCE`) | §46 | 🟡 | Trust module groundwork | No "100% safe" language; no purchasable scores (spec §67) |
 | Verified transaction reviews (separate from complaints) | §40 | 🟡 | Trust ratings groundwork | Verified/unverified/complaint separation pending |
@@ -77,9 +79,9 @@
 
 | Capability | Spec | Status | Where in repo | Notes |
 |---|---|---|---|---|
-| Market overview | §27 | 🔵 | Sprint Intelligence PR (`src/Modules/Intelligence/`, `database/extensions/intelligence.sql`) | |
-| Brand stats | §27 | 🔵 | Sprint Intelligence PR | |
-| Heuristic valuation | §27 | 🔵 | Sprint Intelligence PR | Estimates never presented as guaranteed values |
+| Market overview | §27 | ✅ | Intelligence module (`src/Modules/Intelligence/`, `database/extensions/intelligence.sql`) | |
+| Brand stats | §27 | ✅ | Intelligence module | |
+| Heuristic valuation | §27 | ✅ | Intelligence module | Estimates never presented as guaranteed values |
 | Price intelligence (market ranges by year/mileage/trim/location/import) | §27 | 🟡 | Heuristic valuation groundwork | Full factor model + AI training on provenance is **Later** |
 | TCO (1/3/5-year: fuel, insurance, maintenance, depreciation) | §50 | ⚪ | — | Major AI recommendation input |
 | EV platform (battery health score, charging intelligence, EV passport) | §49 | ⚪ | — | |
@@ -90,9 +92,9 @@
 
 | Capability | Spec | Status | Where in repo | Notes |
 |---|---|---|---|---|
-| Transactions | §33 | 🔵 | Sprint Finance PR (`src/Modules/Finance/`, `database/extensions/finance.sql`) | |
-| Escrow / transaction state machine | §34 | 🔵 | Sprint Finance PR | Strongly-validated states incl. `CANCELLED`/`DISPUTED`; transitions audited |
-| Payment webhook | §35 | 🔵 (stub) | Sprint Finance PR | Stub today; authenticated/idempotent/replay-safe handling is the M-Pesa work |
+| Transactions | §33 | ✅ | Finance module (`src/Modules/Finance/`, `database/extensions/finance.sql`) | |
+| Escrow / transaction state machine | §34 | ✅ | Finance module | Strongly-validated states incl. `CANCELLED`/`DISPUTED`; transitions audited |
+| Payment webhook | §35 | ✅ (stub) | Finance module | Stub today; authenticated/idempotent/replay-safe handling is the M-Pesa work |
 | M-Pesa Daraja integration (STK Push → callback → reconcile) | §35 | 🟡 | Finance payment abstraction groundwork | Top **Next** item; licensed partner structure, no unlicensed fund holding |
 | Payment abstraction (bank, cards, partners) | §35 | 🟡 | Finance module groundwork | Callbacks must be authenticated, idempotent, replay-safe, logged, reconciled |
 | Ownership transfer workflow | §36 | ⚪ | — | Lawful/authorized integrations only; never fabricate verification |
@@ -104,9 +106,9 @@
 
 | Capability | Spec | Status | Where in repo | Notes |
 |---|---|---|---|---|
-| Parts catalogue | §36 (f2) | 🔵 | Sprint Parts PR (`src/Modules/Parts/`, `database/extensions/parts.sql`) | Seller tiers (authorized distributor → unverified) spec'd for later |
-| Compatibility engine (vehicle → part numbers/OEM/aftermarket) | §37 (f2) | 🔵 | Sprint Parts PR | Never claim compatibility without sufficient data |
-| Stock management | §36 (f2) | 🔵 | Sprint Parts PR | |
+| Parts catalogue | §36 (f2) | ✅ | Parts module (`src/Modules/Parts/`, `database/extensions/parts.sql`) | Seller tiers (authorized distributor → unverified) spec'd for later |
+| Compatibility engine (vehicle → part numbers/OEM/aftermarket) | §37 (f2) | ✅ | Parts module | Never claim compatibility without sufficient data |
+| Stock management | §36 (f2) | ✅ | Parts module | |
 | Parts price intelligence (OEM vs aftermarket ranges) | §38 (f2) | ⚪ | — | Flag suspiciously low prices, never auto-label counterfeit |
 | Parts trust score / warranty network / parts passport | §39–41 (f2) | ⚪ | — | |
 
@@ -114,7 +116,7 @@
 
 | Capability | Spec | Status | Where in repo | Notes |
 |---|---|---|---|---|
-| Service bookings + status state machine | §43 (f1) | 🔵 | Sprint Service PR (`src/Modules/Service/`, `database/extensions/service.sql`) | |
+| Service bookings + status state machine | §43 (f1) | ✅ | Service module (`src/Modules/Service/`, `database/extensions/service.sql`) | |
 | Service history events feeding the Passport | §42 (f2), §18 (f1) | 🟡 | Service + Passport modules | Verified provider events appending to provenance pending |
 | Garage marketplace (profiles, real availability, transparent quotes) | §32–34 (f2) | ⚪ | — | |
 | Service centre platform (verified events, invoices, diagnostics) | §43 (f1), §54 (f2) | ⚪ | — | Providers can create events/corrections, never edit history |
@@ -123,14 +125,14 @@
 
 | Capability | Spec | Status | Where in repo | Notes |
 |---|---|---|---|---|
-| Fleets + vehicle assignment | §51 (f2) | 🔵 | Sprint Fleet PR (`src/Modules/Fleet/`, `database/extensions/fleet.sql`) | |
+| Fleets + vehicle assignment | §51 (f2) | ✅ | Fleet module (`src/Modules/Fleet/`, `database/extensions/fleet.sql`) | |
 | Drivers, maintenance, fuel, insurance, utilization, depreciation, AI fleet insights | §51 (f2) | ⚪ | — | |
 
 ## 11. Data (platform data infrastructure)
 
 | Capability | Spec | Status | Where in repo | Notes |
 |---|---|---|---|---|
-| Append-only audit log + helper | §70 (f1) | 🔵 | Sprint Data PR (`src/Modules/Data/`, `database/extensions/data.sql`) | Marketplace + module mutations feed this |
+| Append-only audit log + helper | §70 (f1) | ✅ | Data module (`src/Modules/Data/`, `database/extensions/data.sql`) | Marketplace + module mutations feed this |
 | Digital evidence vault (hash-chained immutable artifacts) | §39 (f1), §48 (f2) | ⚪ | — | Hash proves artifact unchanged, not document authenticity |
 | Event bus / long-running workflows | §9–10 (f1) | ⚪ | — | |
 | Object storage (signed URLs, malware scan) | §11 (f1) | ⚪ | — | |
@@ -180,8 +182,8 @@
 | Capability | Spec | Status | Where in repo | Notes |
 |---|---|---|---|---|
 | `/api/v1` versioned gateway | §78 | ✅ | `src/server.ts` mounts `app.use('/api/v1', modulesRouter)`; `src/Router/modules.ts` registry | One-line-per-module self-registration convention |
-| Platform modules mounted under the gateway | §78, §79 | 🔵 | Sprint module PRs × 8 | Trust, Passport, Intelligence, Parts, Service, Fleet, Finance, Data |
-| OpenAPI contract | §78 | 🔵 | Sprint API PR | Published contract for the gateway |
+| Platform modules mounted under the gateway | §78, §79 | ✅ | Module PRs #35–#42 merged: `src/Modules/{Trust,Passport,Intelligence,Parts,Service,Fleet,Finance,Data}/` + `database/extensions/*.sql` | Trust, Passport, Intelligence, Parts, Service, Fleet, Finance, Data |
+| OpenAPI contract | §78 | ✅ | `services/vehicles-api/openapi.yaml` (canonical) served at `GET /api/v1/openapi.yaml` with `X-API-Version: v1`; tour in [`API.md`](API.md) | Every path cross-checked against the routers |
 | JSON envelopes | §78 | ✅ | All controllers; `apps/web/src/api/api.js` documents the contract | `{ success, message, data }` |
 | Parameterized stored procedures (SQLi defense) | §49 | ✅ | `database/procedures_*.sql`; `src/DatabaseHelper/index.ts` | No string-built SQL |
 | Central error handling / 404 | §49 | ✅ | `Middlewares/errorHandler.ts`, `Middlewares/notFound.ts` | No stack traces or SQL errors leak |
@@ -199,20 +201,26 @@
 
 ## Top 10 pending features to build next
 
-Prioritized by impact vs effort, given what already exists (Finance state machine ✅ this sprint, Passport timeline ✅, Data audit log ✅, cron worker ✅).
+Prioritized by impact vs effort, given what already exists: **all 8 platform modules
+are shipped** (Trust, Passport, Intelligence, Parts, Service, Fleet, Finance, Data —
+merge PRs #35–#42, contract tests #43) plus the OpenAPI contract for `/api/v1`, the
+Finance escrow state machine ✅, the Passport timeline ✅, the Data audit log ✅ and
+the cron worker ✅. The parts/service/fleet/finance/data scaffolding items that used
+to occupy this list are done; what remains below is genuinely pending — the full
+audit per capability stays in the section tables above.
 
 | # | Feature | Rationale (impact vs effort) |
 |---|---|---|
 | 1 | **M-Pesa Daraja integration** behind the Finance abstraction (authenticated, idempotent, reconciled callbacks) | Highest impact — turns the shipped escrow state machine into revenue; medium effort since the state machine + webhook stub already exist |
 | 2 | **Inspection platform v1** (workflow, checklist, evidence upload) | Core to the "evidence, not trust" principle — nothing can be honestly called *verified* without it; medium effort, mostly CRUD + upload + states |
-| 3 | **Listing lifecycle states** (`DRAFT → PENDING_VERIFICATION → PUBLISHED → …`) replacing binary soft delete | Small effort (state column + transition guards) but immediately makes verification statuses meaningful marketplace-wide |
-| 4 | **Provenance event writers** wired into marketplace/finance/service actions (`LISTED`, `RESERVED`, `SOLD`, `SERVICED`) | Low effort — Passport timeline + audit helper are already shipped; it just needs the call sites, and it makes every other feature more trustworthy |
-| 5 | **Seller verification with document checks** (identity + business, OCR extraction separated from authenticity) | High trust impact; medium effort; reuses Trust module profiles and unblocks verified-review weighting |
-| 6 | **Listing versioning / price & mileage change audit** | Cheap (build directly on the Data append-only log) and disproportionately valuable for dispute evidence later |
-| 7 | **Notification fan-out** (event-driven email/SMS/in-app + preferences) | Low-medium effort on the existing cron worker; high retention/safety value (payment secured, transfer completed, price changed) |
-| 8 | **Search service** (indexed filters incl. verification + trust score, NL query v0) | High discovery impact; medium effort; also unblocks the AI buying assistant later |
-| 9 | **Disputes v1** (evidence-backed dispute package assembling listing versions, passport, inspection, payments) | Must exist before transaction volume scales; medium effort, mostly assembling artifacts that features 1–6 already produce |
-| 10 | **Dealer OS v1** (inventory import, listing management, leads) | Biggest supply-side growth lever; medium-high effort, but reuses listing lifecycle + verification from items 3 and 5 |
+| 3 | **Seller verification with document checks** (identity + business, OCR extraction separated from authenticity) | High trust impact; medium effort; reuses the shipped Trust module profiles and unblocks verified-review weighting |
+| 4 | **Listing lifecycle states** (`DRAFT → PENDING_VERIFICATION → PUBLISHED → …`) replacing binary soft delete | Small effort (state column + transition guards) but immediately makes verification statuses meaningful marketplace-wide |
+| 5 | **Provenance event writers** wired into marketplace/finance/service actions (`LISTED`, `RESERVED`, `SOLD`, `SERVICED`) | Low effort — Passport timeline + audit helper are already shipped; it just needs the call sites, and it makes every other feature more trustworthy |
+| 6 | **Notification fan-out** (event-driven email/SMS/in-app + preferences) | Low-medium effort on the existing cron worker; high retention/safety value (payment secured, transfer completed, price changed) |
+| 7 | **Search service** (indexed filters incl. verification + trust score, NL query v0) | High discovery impact; medium effort; also unblocks the AI buying assistant later |
+| 8 | **Dealer OS v1** (inventory import, listing management, leads) | Biggest supply-side growth lever; medium-high effort, but reuses listing lifecycle + verification from items 3 and 4 |
+| 9 | **Web app SPA rebuild** (Next.js, mobile-first, Passport timeline UI) | Consumes `/api/v1` — the OpenAPI contract makes client generation/typing straightforward; replaces the legacy vanilla pages |
+| 10 | **AI models on the provenance graph** (factor price intelligence, fraud engine, Scam Shield) | Unlocks once inspection + transaction data accumulate through items 1–5; the shipped Intelligence heuristic + audit trail are the training-data substrate |
 
 *Explicitly out of scope by design: purchasable verification badges, ads overriding trust ranking, merged verified/unverified review scores, fake verification claims (Spec §67, §61, §40).*
 

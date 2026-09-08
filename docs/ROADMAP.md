@@ -33,6 +33,7 @@ exist as code, not as slideware.
 | Finance module | Transactions + escrow state machine + payment webhook stub | Spec §33, §34 (partial), §35 (partial) |
 | Data module | Append-only audit log + helper for platform events | Spec §70 (partial) |
 | API gateway | `/api/v1` mounted in `services/vehicles-api/src/server.ts`; module self-registration registry in `Router/modules.ts`; module SQL slots in `database/extensions/` + `master.sql` | Spec §78 (partial) |
+| OpenAPI contract | Sprint closed with all 8 modules merged (PRs #35–#42) + contract tests #43: `services/vehicles-api/openapi.yaml` served at `GET /api/v1/openapi.yaml` (`X-API-Version: v1`), human tour in `docs/API.md` | Spec §78 (partial) |
 | CI | GitHub Actions: type-check + build both services, compile web app, secret scan; issue/PR templates | Spec §76 (partial) |
 | Docs | Vision, architecture, roadmap, features audit, research, AI strategy | — |
 

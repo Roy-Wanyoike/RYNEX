@@ -1,0 +1,2509 @@
+openapi: 3.0.3
+info:
+  title: RYNEX Vehicles API — versioned platform gateway
+  version: 1.0.0
+  description: |
+    HTTP contract for the RYNEX vehicles API: the legacy marketplace surface
+    (`/health`, `/auth/*`, `/users`, `/products/*`, `/cart/*`) plus the
+    versioned platform gateway `/api/v1/*` (Trust, Passport, Intelligence,
+    Parts, Service, Fleet, Finance, Data — self-registered in
+    `src/Router/modules.ts`).
+
+    **Envelope.** Every JSON response uses the platform envelope
+    `{ success, message, data? }` — `success: true` with an optional `data`
+    payload on 2xx, `success: false` with a safe message on failures. Raw
+    SQL/driver errors are never leaked to clients (generic 500 instead).
+
+    **Auth.** `POST /auth/login` returns a JWT (1h expiry) signed with the
+    platform secret; send it as `Authorization: Bearer <token>`. Admin-only
+    routes additionally require the `isAdmin: true` claim inside the JWT
+    (enforced by `Middlewares/requireAdmin`); non-admin tokens get `403`.
+
+    **Gateway header.** Every `/api/v1/*` response carries `X-API-Version: v1`.
+
+    **Machine contract.** This document is served live at
+    `GET /api/v1/openapi.yaml` (`text/yaml`); the human tour lives in
+    `docs/API.md`. Every path below is verified against the actual routers —
+    nothing aspirational is listed.
+servers:
+  - url: http://localhost:4000
+    description: Local development server (PORT env overrides 4000)
+tags:
+  - name: Gateway
+    description: Versioned gateway meta endpoints
+  - name: Health
+  - name: Auth
+  - name: Users
+  - name: Products
+    description: Legacy vehicle catalogue (admin writes, public reads)
+  - name: Cart
+  - name: Trust
+    description: Seller profiles, explainable trust score, ratings, leaderboard
+  - name: Passport
+    description: Vehicle digital identity + append-only provenance timeline
+  - name: Intelligence
+    description: Read-only market analytics and heuristic valuation
+  - name: Parts
+    description: Parts catalogue with vehicle-fit metadata and stock
+  - name: Service
+    description: Service bookings + admin status state machine
+  - name: Fleet
+    description: Fleets and vehicle assignment (owner or admin)
+  - name: Finance
+    description: Protected transactions, escrow state machine, webhook stub
+  - name: Data
+    description: Append-only audit trail (read-only API, admin only)
+security: []
+
+paths:
+  /api/v1/openapi.yaml:
+    get:
+      tags: [Gateway]
+      summary: This OpenAPI contract (served as YAML)
+      description: >
+        Returns the raw OpenAPI 3.0.3 document with
+        `Content-Type: text/yaml; charset=utf-8`. Responses under /api/v1 also
+        carry the `X-API-Version: v1` header.
+      operationId: getOpenapiYaml
+      security: []
+      responses:
+        '200':
+          description: The OpenAPI document
+          content:
+            text/yaml:
+              schema:
+                type: string
+
+  /health:
+    get:
+      tags: [Health]
+      summary: Liveness probe
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: API healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageEnvelope'
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a user account
+      description: >
+        Public. `isAdmin` is dropped from the body server-side — clients can
+        never self-assign a role. Password must be 8+ chars with upper, lower,
+        number and special character. Duplicate username/email -> 409.
+      operationId: registerUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterBody'
+      responses:
+        '201':
+          description: User registered (no data payload)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in and receive a JWT
+      description: >
+        Public. Returns `{ token, user }` where `user` is the JWT payload
+        (`userId, userName, email, fullName, isAdmin`). Unknown user and wrong
+        password answer the same generic 401 (no account enumeration).
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /users:
+    get:
+      tags: [Users]
+      summary: List all user accounts
+      description: >
+        Admin only (bearer + `isAdmin` claim). Password hashes are stripped
+        defensively before responding.
+      operationId: getUsers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Users fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /products:
+    post:
+      tags: [Products]
+      summary: Add a car to the catalogue
+      description: >
+        Admin only (bearer + `isAdmin`). `carId` (uuid) and `isDeleted` are
+        server-owned; client-sent values for them are ignored.
+      operationId: addProduct
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarBody'
+      responses:
+        '201':
+          description: Product added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /products/getproducts:
+    get:
+      tags: [Products]
+      summary: Public catalogue (live cars only)
+      operationId: getProducts
+      security: []
+      responses:
+        '200':
+          description: Cars fetched (`isDeleted = 0` rows)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /products/getcarbodyshape/{bodyType}:
+    get:
+      tags: [Products]
+      summary: Cars filtered by body type
+      operationId: getCarBodyShape
+      security: []
+      parameters:
+        - name: bodyType
+          in: path
+          required: true
+          schema:
+            type: string
+          example: SUV
+      responses:
+        '200':
+          description: Cars fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: No cars found for that body type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /products/getcarbrand/{brand}:
+    get:
+      tags: [Products]
+      summary: Cars filtered by brand
+      operationId: getCarBrand
+      security: []
+      parameters:
+        - name: brand
+          in: path
+          required: true
+          schema:
+            type: string
+          example: Toyota
+      responses:
+        '200':
+          description: Cars fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: No cars found for that brand
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /products/getonecar/{carId}:
+    get:
+      tags: [Products]
+      summary: One car by id
+      operationId: getOneCar
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CarIdPath'
+      responses:
+        '200':
+          description: Car fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: No cars found for that id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /products/softdeletecar/{carId}:
+    post:
+      tags: [Products]
+      summary: Soft-delete a car (flag `isDeleted = 1`)
+      description: Admin only (bearer + `isAdmin`). The row is kept, never removed.
+      operationId: softDeleteCar
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CarIdPath'
+      responses:
+        '200':
+          description: Product removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /cart:
+    post:
+      tags: [Cart]
+      summary: Add a car to the current user's cart
+      description: >
+        Bearer. Only `{ carId, quantity }` is trusted — brand and price are
+        derived from `Cars` inside `spAddToCart` (no client-side price
+        tampering). Upserts on `(userId, carId)`, merging quantity.
+      operationId: addToCart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartAddBody'
+      responses:
+        '201':
+          description: Added to cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags: [Cart]
+      summary: Current user's cart rows
+      operationId: getCart
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cart fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /cart/add/{cardID}:
+    post:
+      tags: [Cart]
+      summary: Increment a cart row's quantity by 1
+      operationId: incrementCartItem
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CardIdPath'
+      responses:
+        '200':
+          description: Quantity increased
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /cart/subtract/{cardID}:
+    post:
+      tags: [Cart]
+      summary: Decrement a cart row's quantity by 1
+      description: The stored procedure deletes the row when quantity reaches 0.
+      operationId: decrementCartItem
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CardIdPath'
+      responses:
+        '200':
+          description: Quantity decreased
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /cart/all:
+    get:
+      tags: [Cart]
+      summary: Every user's cart (joined with userName)
+      description: Admin only (bearer + `isAdmin`).
+      operationId: getAllCarts
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All carts fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ------------------------------------------------------------------ Trust --
+  /api/v1/trust/leaderboard:
+    get:
+      tags: [Trust]
+      summary: Top 20 sellers by trust score
+      description: >
+        Public. Deterministic tie-breaks: more ratings first, then userName.
+      operationId: getTrustLeaderboard
+      security: []
+      responses:
+        '200':
+          description: Trust leaderboard fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerProfileListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/trust/sellers/{userId}:
+    get:
+      tags: [Trust]
+      summary: One seller profile + trust score
+      description: >
+        Public. `404` when the seller has no profile yet — profiles are only
+        created by the admin verify / rating flows, never auto-created on read.
+      operationId: getSellerProfile
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdPath'
+      responses:
+        '200':
+          description: Seller profile fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerProfileEnvelope'
+        '404':
+          description: Seller profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/trust/sellers/{userId}/verify:
+    post:
+      tags: [Trust]
+      summary: Set verification flags / business name (admin)
+      description: >
+        Admin only (bearer + `isAdmin`). Every body field is optional; fields
+        left out are preserved (COALESCE upsert). Recomputes the trust score
+        and returns the full profile. `404` for unknown users.
+      operationId: verifySeller
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrustVerifyBody'
+      responses:
+        '200':
+          description: Seller profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerProfileEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Seller user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/trust/sellers/{userId}/rating:
+    post:
+      tags: [Trust]
+      summary: Rate a seller (1..5)
+      description: >
+        Any authenticated user. Self-rating -> 400 `Cannot rate yourself`.
+        Auto-provisions the seller profile on the first rating, accumulates
+        ratingSum/ratingCount and returns the new summary + score.
+      operationId: rateSeller
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingBody'
+      responses:
+        '200':
+          description: Rating recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerProfileEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Seller user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # --------------------------------------------------------------- Passport --
+  /api/v1/passport:
+    post:
+      tags: [Passport]
+      summary: Issue a vehicle passport (admin)
+      description: >
+        Admin only (bearer + `isAdmin`). Anchors a passport to a catalogue car.
+        THROW mapping: 50401 car not found -> 404, 50402 passport already
+        exists -> 409, 50403 invalid event type -> 400.
+      operationId: createPassport
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PassportCreateBody'
+      responses:
+        '201':
+          description: Passport created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PassportEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Car not found (SQL 50401)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Passport already exists (SQL 50402)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/passport/{carId}:
+    get:
+      tags: [Passport]
+      summary: A vehicle's passport + full provenance timeline
+      description: >
+        Public. `data` is `{ passport, events }` with events ordered
+        `occurredAt DESC`. `404` when the car has no passport. Append-only by
+        design — there are no edit/delete endpoints.
+      operationId: getPassport
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CarIdPath'
+      responses:
+        '200':
+          description: Passport fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PassportBundleEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Passport not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/passport/{carId}/events:
+    post:
+      tags: [Passport]
+      summary: Append one provenance event (admin)
+      description: >
+        Admin only (bearer + `isAdmin`). `eventType` whitelist:
+        REGISTRATION, INSPECTION, SERVICE, TRANSFER, ACCIDENT, OWNERSHIP,
+        OTHER. `occurredAt` defaults to now; `recordedBy` is stamped from the
+        admin JWT. Events are immutable.
+      operationId: addPassportEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CarIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PassportEventBody'
+      responses:
+        '201':
+          description: Event recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PassportEventEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Car not found / no passport (SQL 50401)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ----------------------------------------------------------- Intelligence --
+  /api/v1/intelligence/market/overview:
+    get:
+      tags: [Intelligence]
+      summary: Market-wide totals + per-brand breakdown
+      description: >
+        Public (module is strictly read-only). Aggregates only live
+        (`isDeleted = 0`) listings.
+      operationId: getMarketOverview
+      security: []
+      responses:
+        '200':
+          description: Market overview fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketOverviewEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/intelligence/brands:
+    get:
+      tags: [Intelligence]
+      summary: Per-brand listing counts and price stats
+      description: "Public. Ordered by `listingCount` DESC (tie-break: brand name)."
+      operationId: getBrandStats
+      security: []
+      responses:
+        '200':
+          description: Brand stats fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandStatListEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/intelligence/valuation/{carId}:
+    get:
+      tags: [Intelligence]
+      summary: Heuristic valuation for one live car
+      description: >
+        Public. `suggestedPrice` = brand+bodyType cohort average; `deltaPct`
+        is the car's distance from it; `confidence` is `medium` at >= 5 live
+        cohort listings, else `low`. Estimates are never guaranteed values.
+        SQL 50501 (car missing or soft-deleted) -> 404.
+      operationId: getValuation
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CarIdPath'
+      responses:
+        '200':
+          description: Valuation fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValuationEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Car not found (SQL 50501)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ------------------------------------------------------------------ Parts --
+  /api/v1/parts:
+    post:
+      tags: [Parts]
+      summary: Create a catalogue part (admin)
+      description: >
+        Admin only (bearer + `isAdmin`). `partId` is a server-generated uuid;
+        `stockQty` starts at 0 and only changes via the stock endpoint. The
+        fit window must not end before it starts.
+      operationId: addPart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartBody'
+      responses:
+        '201':
+          description: Part added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags: [Parts]
+      summary: Browse the catalogue
+      description: >
+        Public. Optional compatibility filters; absent/empty query values mean
+        "any" (parts with all fit columns NULL are universal).
+      operationId: getParts
+      security: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            maxLength: 50
+        - name: brand
+          in: query
+          schema:
+            type: string
+            maxLength: 50
+        - name: fitsMake
+          in: query
+          schema:
+            type: string
+            maxLength: 50
+        - name: fitsModel
+          in: query
+          schema:
+            type: string
+            maxLength: 50
+      responses:
+        '200':
+          description: Parts fetched (ordered by name)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/parts/{partId}:
+    get:
+      tags: [Parts]
+      summary: One live part
+      operationId: getOnePart
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/PartIdPath'
+      responses:
+        '200':
+          description: Part fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Part not found (or soft-deleted)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [Parts]
+      summary: Soft-delete a part (admin)
+      description: Admin only. Sets `isDeleted = 1`; the row is kept for audit. SQL 50602 -> 404.
+      operationId: removePart
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PartIdPath'
+      responses:
+        '200':
+          description: Part removed (no data payload)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Part not found (SQL 50602)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/parts/{partId}/stock:
+    patch:
+      tags: [Parts]
+      summary: Adjust stock by a signed delta (admin)
+      description: >
+        Admin only. `delta` is an integer -999..999 (positive = restock,
+        negative = consume). Stock can never go negative server-side
+        (SQL 50601 -> 409); unknown part -> SQL 50602 -> 404.
+      operationId: adjustStock
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PartIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockDeltaBody'
+      responses:
+        '200':
+          description: Stock updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Part not found (SQL 50602)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Adjustment would make quantity negative (SQL 50601)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ---------------------------------------------------------------- Service --
+  /api/v1/service/bookings:
+    post:
+      tags: [Service]
+      summary: Book a service
+      description: >
+        Bearer. `serviceType` is INSPECTION | MAINTENANCE | REPAIR |
+        DIAGNOSTICS; `preferredDate` must be a strict YYYY-MM-DD real calendar
+        date, today or later. `bookingId`/`userId` are server-owned. SQL
+        50701/50702/50705 -> 400, 50703 -> 409, 50704 -> 404.
+      operationId: createBooking
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingBody'
+      responses:
+        '201':
+          description: Service booking created (status PENDING)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags: [Service]
+      summary: Current user's bookings (newest first)
+      operationId: getMyBookings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Bookings fetched (joined with car model/brand)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/service/bookings/all:
+    get:
+      tags: [Service]
+      summary: Every booking (admin)
+      description: Admin only. Rows additionally joined with `userName`.
+      operationId: getAllBookings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Bookings fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/service/bookings/{bookingId}/status:
+    patch:
+      tags: [Service]
+      summary: Move a booking through the status state machine (admin)
+      description: >
+        Admin only. `:bookingId` must be a uuid (router rejects non-uuid with
+        400). Status whitelist: PENDING | CONFIRMED | IN_PROGRESS | COMPLETED |
+        CANCELLED. Transition legality is enforced in the database
+        (`spUpdateBookingStatus`): no-op moves and terminal escapes -> 409
+        (SQL 50703); unknown booking -> 404 (SQL 50704).
+      operationId: updateBookingStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingStatusBody'
+      responses:
+        '200':
+          description: Booking status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Booking not found (SQL 50704)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Illegal status transition (SQL 50703)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ------------------------------------------------------------------ Fleet --
+  /api/v1/fleet/fleets:
+    post:
+      tags: [Fleet]
+      summary: Create a fleet
+      description: >
+        Bearer. Owner is ALWAYS the JWT `userId` (never client-supplied);
+        `fleetId` is a server-generated uuid.
+      operationId: createFleet
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FleetBody'
+      responses:
+        '201':
+          description: Fleet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FleetEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags: [Fleet]
+      summary: The caller's fleets (with vehicle counts)
+      operationId: getMyFleets
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Fleets fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FleetListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/fleet/fleets/all:
+    get:
+      tags: [Fleet]
+      summary: Every fleet (admin)
+      description: Admin only. Joined with the owner's `userName` + counts.
+      operationId: getAllFleets
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All fleets fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FleetListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/fleet/fleets/{fleetId}/vehicles:
+    get:
+      tags: [Fleet]
+      summary: List a fleet's vehicles (owner or admin)
+      description: Owner or admin; non-uuid `:fleetId` -> 400. Unknown fleet -> 404, not owner -> 403.
+      operationId: getFleetVehicles
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/FleetIdPath'
+      responses:
+        '200':
+          description: Fleet vehicles fetched (joined with Cars)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FleetVehicleListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Fleet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [Fleet]
+      summary: Assign a catalogue car to the fleet (owner or admin)
+      description: >
+        Owner or admin. SQL mapping: 50801 car missing/soft-deleted -> 404,
+        50802 already in fleet -> 409, 50803 fleet missing -> 404.
+      operationId: assignVehicle
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/FleetIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignVehicleBody'
+      responses:
+        '201':
+          description: Vehicle assigned to fleet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FleetVehicleEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Car not found or unavailable (50801) / fleet not found (50803)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Vehicle already in fleet (SQL 50802)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/fleet/fleets/{fleetId}/vehicles/{carId}:
+    delete:
+      tags: [Fleet]
+      summary: Remove a vehicle from a fleet (owner or admin)
+      description: >
+        Owner or admin. Idempotent: removing a car that is not in the fleet
+        still answers 200 `Vehicle removed`.
+      operationId: removeVehicle
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/FleetIdPath'
+        - $ref: '#/components/parameters/CarIdPath'
+      responses:
+        '200':
+          description: Vehicle removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FleetVehicleEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Fleet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ---------------------------------------------------------------- Finance --
+  /api/v1/finance/transactions:
+    post:
+      tags: [Finance]
+      summary: Initiate a protected transaction
+      description: >
+        Bearer. `txId` (uuid) is always generated server-side; rows start at
+        INITIATED and only the admin status endpoint can move them. `provider`
+        is MPESA | CARD | ESCROW; `amount` is positive with <= 2 decimal
+        places. SQL mapping: 50901 -> 400, 50904/50905 -> 404, 50906 -> 400.
+      operationId: initiateTransaction
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionBody'
+      responses:
+        '201':
+          description: Transaction initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Car not found or unavailable (50904) / user not found (50905)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/finance/transactions/mine:
+    get:
+      tags: [Finance]
+      summary: Current user's transactions (newest first)
+      description: Bearer. Declared before `/transactions/:txId` so the literal segment wins.
+      operationId: getMyTransactions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Transactions fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/finance/transactions/{txId}:
+    get:
+      tags: [Finance]
+      summary: One transaction
+      description: >
+        Bearer. `:txId` must be a uuid (router 400 otherwise). 404 when
+        missing; 403 when the caller is neither the owner nor an admin.
+      operationId: getTransaction
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TxIdPath'
+      responses:
+        '200':
+          description: Transaction fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Transaction not found (SQL 50903)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/finance/transactions/{txId}/status:
+    patch:
+      tags: [Finance]
+      summary: Escrow state-machine transition (admin)
+      description: >
+        Admin only. `status` whitelist: INITIATED | PENDING | HELD | RELEASED |
+        REFUNDED | FAILED. Legal edges: INITIATED -> PENDING|FAILED,
+        PENDING -> HELD|FAILED, HELD -> RELEASED|REFUNDED; terminal states are
+        closed. Illegal moves -> 409 (SQL 50902), unknown tx -> 404 (50903).
+      operationId: updateTransactionStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TxIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionStatusBody'
+      responses:
+        '200':
+          description: Transaction status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Transaction not found (SQL 50903)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Invalid transaction transition (SQL 50902)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/finance/webhooks/{provider}:
+    post:
+      tags: [Finance]
+      summary: Payment-provider webhook (PUBLIC, v1 stub)
+      description: >
+        Public server-to-server endpoint — providers have no JWT. v1 stub:
+        acknowledges with 202 and persists NOTHING; the body is discarded.
+        PRODUCTION MUST verify the provider signature (M-Pesa Daraja callback
+        validation / PSP HMAC) before trusting payloads or moving escrow
+        state — see the Finance module README.
+      operationId: receiveWebhook
+      security: []
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Payment provider identifier (e.g. MPESA)
+          example: MPESA
+      responses:
+        '202':
+          description: Webhook received (no persistence in v1)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageEnvelope'
+
+  # ------------------------------------------------------------------- Data --
+  /api/v1/data/audit:
+    get:
+      tags: [Data]
+      summary: Audit trail of one entity (admin)
+      description: >
+        Admin only. Read-only by design — audit rows are appended by server
+        code (`recordAudit` -> `spWriteAudit`), never by clients. Requires
+        `?entityType=` (400 when missing); `entityId` is optional (omit to get
+        every entry of that type). Newest first.
+      operationId: getAuditByEntity
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entityType
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Entity type filter (e.g. USER, CAR, CART, PASSPORT, TX)
+          example: CAR
+        - name: entityId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Audit entries fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEntryListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/data/audit/recent:
+    get:
+      tags: [Data]
+      summary: Newest audit entries (admin)
+      description: >
+        Admin only. `top` is clamped to 1..200 (missing/invalid -> 50);
+        clamped again server-side inside `spGetRecentAudit`.
+      operationId: getRecentAudit
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: top
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+      responses:
+        '200':
+          description: Recent audit entries fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEntryListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+# ------------------------------------------------------------------ components
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        JWT issued by POST /auth/login (1h expiry). Payload:
+        `{ userId, userName, email, fullName, isAdmin }`. Admin-only routes
+        require `isAdmin: true` in the token (Middlewares/requireAdmin);
+        non-admin tokens receive 403.
+
+  parameters:
+    CarIdPath:
+      name: carId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Catalogue car id (uuid)
+    CardIdPath:
+      name: cardID
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Cart row id (legacy spelling `cardID`, as routed by the API)
+    UserIdPath:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: User id (uuid)
+    PartIdPath:
+      name: partId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Part id (uuid)
+    BookingIdPath:
+      name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Service booking id (uuid; non-uuid rejected with 400)
+    FleetIdPath:
+      name: fleetId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Fleet id (uuid; non-uuid rejected with 400)
+    TxIdPath:
+      name: txId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Transaction id (uuid; non-uuid rejected with 400)
+
+  schemas:
+    # ---- Envelope pattern ------------------------------------------------
+    Envelope:
+      type: object
+      description: Platform response envelope. `data` is present on most 2xx responses and absent on message-only ones.
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          description: True on success, false on failure.
+        message:
+          type: string
+        data:
+          description: Payload (shape documented per endpoint).
+          nullable: true
+    MessageEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+    Error:
+      type: object
+      description: Failure envelope. Messages are safe — raw SQL/driver errors never reach clients.
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        message:
+          type: string
+          example: Route not found
+
+    # ---- Auth / users ----------------------------------------------------
+    RegisterBody:
+      type: object
+      required: [userName, email, password]
+      properties:
+        userName:
+          type: string
+          minLength: 3
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          maxLength: 100
+        password:
+          type: string
+          format: password
+          description: 8+ chars with upper, lower, number and special character.
+        address:
+          type: string
+          maxLength: 100
+          nullable: true
+        fullName:
+          type: string
+          maxLength: 100
+          nullable: true
+        phoneNo:
+          type: string
+          maxLength: 100
+          nullable: true
+        country:
+          type: string
+          maxLength: 100
+          nullable: true
+    LoginBody:
+      type: object
+      required: [userName, password]
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+          format: password
+    JwtUser:
+      type: object
+      description: Decoded JWT payload (also the login response `user`).
+      properties:
+        userId:
+          type: string
+        userName:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+        isAdmin:
+          type: boolean
+    LoginData:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Bearer JWT (1h expiry).
+        user:
+          $ref: '#/components/schemas/JwtUser'
+    UserAccount:
+      type: object
+      description: User row with the password hash stripped.
+      properties:
+        userId:
+          type: string
+        userName:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+          nullable: true
+        fullName:
+          type: string
+          nullable: true
+        phoneNo:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        isAdmin:
+          type: boolean
+        emailSent:
+          type: boolean
+      additionalProperties: true
+
+    # ---- Products / cart -------------------------------------------------
+    CarBody:
+      type: object
+      required: [model, bodyType, brand, prices]
+      properties:
+        model:
+          type: string
+        bodyType:
+          type: string
+        brand:
+          type: string
+        prices:
+          type: number
+          format: double
+          description: Positive asking price (DECIMAL(10,2)).
+        pictureUrl:
+          type: string
+          nullable: true
+    Car:
+      type: object
+      properties:
+        carId:
+          type: string
+        model:
+          type: string
+        bodyType:
+          type: string
+        brand:
+          type: string
+        prices:
+          type: number
+          format: double
+        pictureUrl:
+          type: string
+          nullable: true
+        isDeleted:
+          type: boolean
+      additionalProperties: true
+    CartAddBody:
+      type: object
+      required: [carId, quantity]
+      properties:
+        carId:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 99
+    CartItem:
+      type: object
+      properties:
+        cardID:
+          type: string
+        carId:
+          type: string
+        model:
+          type: string
+        carBrand:
+          type: string
+          nullable: true
+        prices:
+          type: number
+          format: double
+          description: Resolved server-side from Cars — never client-supplied.
+        quantity:
+          type: integer
+        pictureUrl:
+          type: string
+          nullable: true
+      additionalProperties: true
+
+    # ---- Trust -----------------------------------------------------------
+    TrustVerifyBody:
+      type: object
+      description: All fields optional; omitted/null fields are left unchanged. At least one field required.
+      minProperties: 1
+      properties:
+        idVerified:
+          type: boolean
+          nullable: true
+        phoneVerified:
+          type: boolean
+          nullable: true
+        emailVerified:
+          type: boolean
+          nullable: true
+        businessName:
+          type: string
+          maxLength: 100
+          nullable: true
+    RatingBody:
+      type: object
+      required: [rating]
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+    SellerProfile:
+      type: object
+      description: >
+        Seller profile row (joined with userName/email) + computed ratingAvg
+        and the explainable trustScore (0-100).
+      properties:
+        userId:
+          type: string
+        userName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        idVerified:
+          type: boolean
+        phoneVerified:
+          type: boolean
+        emailVerified:
+          type: boolean
+        businessName:
+          type: string
+          nullable: true
+        ratingSum:
+          type: integer
+        ratingCount:
+          type: integer
+        ratingAvg:
+          type: number
+          format: double
+          nullable: true
+        salesCount:
+          type: integer
+        disputeCount:
+          type: integer
+        trustScore:
+          type: number
+          format: double
+        updatedAt:
+          type: string
+          format: date-time
+      additionalProperties: true
+
+    # ---- Passport --------------------------------------------------------
+    PassportCreateBody:
+      type: object
+      required: [carId]
+      properties:
+        carId:
+          type: string
+          maxLength: 50
+        vin:
+          type: string
+          maxLength: 50
+          nullable: true
+        firstRegisteredAt:
+          type: string
+          format: date-time
+          nullable: true
+    PassportEventBody:
+      type: object
+      required: [eventType, description]
+      properties:
+        eventType:
+          type: string
+          enum: [REGISTRATION, INSPECTION, SERVICE, TRANSFER, ACCIDENT, OWNERSHIP, OTHER]
+        description:
+          type: string
+          maxLength: 500
+        occurredAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When it happened in the real world; defaults to now.
+    Passport:
+      type: object
+      properties:
+        passportId:
+          type: string
+        carId:
+          type: string
+        vin:
+          type: string
+          nullable: true
+        firstRegisteredAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      additionalProperties: true
+    PassportEvent:
+      type: object
+      properties:
+        eventId:
+          type: string
+        carId:
+          type: string
+        eventType:
+          type: string
+          enum: [REGISTRATION, INSPECTION, SERVICE, TRANSFER, ACCIDENT, OWNERSHIP, OTHER]
+        description:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+        recordedBy:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      additionalProperties: true
+    PassportBundle:
+      type: object
+      properties:
+        passport:
+          $ref: '#/components/schemas/Passport'
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/PassportEvent'
+
+    # ---- Intelligence ----------------------------------------------------
+    MarketTotals:
+      type: object
+      properties:
+        activeListings:
+          type: integer
+        avgPrice:
+          type: number
+          format: double
+          nullable: true
+        minPrice:
+          type: number
+          format: double
+          nullable: true
+        maxPrice:
+          type: number
+          format: double
+          nullable: true
+    BrandStat:
+      type: object
+      properties:
+        brand:
+          type: string
+        listingCount:
+          type: integer
+        avgPrice:
+          type: number
+          format: double
+          nullable: true
+        minPrice:
+          type: number
+          format: double
+          nullable: true
+        maxPrice:
+          type: number
+          format: double
+          nullable: true
+    MarketOverview:
+      type: object
+      properties:
+        totals:
+          $ref: '#/components/schemas/MarketTotals'
+        brands:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrandStat'
+    Valuation:
+      type: object
+      description: Car row flattened with cohort stats and the heuristic estimate.
+      properties:
+        carId:
+          type: string
+        model:
+          type: string
+        bodyType:
+          type: string
+        brand:
+          type: string
+        prices:
+          type: number
+          format: double
+        pictureUrl:
+          type: string
+          nullable: true
+        isDeleted:
+          type: boolean
+        cohortCount:
+          type: integer
+        cohortAvgPrice:
+          type: number
+          format: double
+        suggestedPrice:
+          type: number
+          format: double
+        deltaPct:
+          type: number
+          format: double
+        confidence:
+          type: string
+          enum: [low, medium]
+      additionalProperties: true
+
+    # ---- Parts -----------------------------------------------------------
+    PartBody:
+      type: object
+      required: [name, category, price]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        category:
+          type: string
+          maxLength: 50
+        brand:
+          type: string
+          maxLength: 50
+          nullable: true
+        fitsMake:
+          type: string
+          maxLength: 50
+          nullable: true
+        fitsModel:
+          type: string
+          maxLength: 50
+          nullable: true
+        fitsYearFrom:
+          type: integer
+          minimum: 1900
+          maximum: 2100
+          nullable: true
+        fitsYearTo:
+          type: integer
+          minimum: 1900
+          maximum: 2100
+          nullable: true
+        price:
+          type: number
+          format: double
+          description: Positive, <= 2 decimal places, max 99999999.99.
+    StockDeltaBody:
+      type: object
+      required: [delta]
+      properties:
+        delta:
+          type: integer
+          minimum: -999
+          maximum: 999
+          description: Positive = restock, negative = consume.
+    Part:
+      type: object
+      properties:
+        partId:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        brand:
+          type: string
+          nullable: true
+        fitsMake:
+          type: string
+          nullable: true
+        fitsModel:
+          type: string
+          nullable: true
+        fitsYearFrom:
+          type: integer
+          nullable: true
+        fitsYearTo:
+          type: integer
+          nullable: true
+        price:
+          type: number
+          format: double
+        stockQty:
+          type: integer
+        isDeleted:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      additionalProperties: true
+
+    # ---- Service ---------------------------------------------------------
+    BookingBody:
+      type: object
+      required: [carId, serviceType, preferredDate]
+      properties:
+        carId:
+          type: string
+          format: uuid
+        serviceType:
+          type: string
+          enum: [INSPECTION, MAINTENANCE, REPAIR, DIAGNOSTICS]
+        preferredDate:
+          type: string
+          format: date
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+          description: Strict YYYY-MM-DD real calendar date, today or later.
+        notes:
+          type: string
+          maxLength: 500
+          nullable: true
+    BookingStatusBody:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED]
+    Booking:
+      type: object
+      properties:
+        bookingId:
+          type: string
+        userId:
+          type: string
+        userName:
+          type: string
+          nullable: true
+          description: Present on admin reads (bookings/all).
+        carId:
+          type: string
+        model:
+          type: string
+          nullable: true
+        brand:
+          type: string
+          nullable: true
+        serviceType:
+          type: string
+          enum: [INSPECTION, MAINTENANCE, REPAIR, DIAGNOSTICS]
+        preferredDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED]
+        notes:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      additionalProperties: true
+
+    # ---- Fleet -----------------------------------------------------------
+    FleetBody:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+    AssignVehicleBody:
+      type: object
+      required: [carId]
+      properties:
+        carId:
+          type: string
+          format: uuid
+    Fleet:
+      type: object
+      properties:
+        fleetId:
+          type: string
+        ownerUserId:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        vehicleCount:
+          type: integer
+      additionalProperties: true
+    FleetVehicle:
+      type: object
+      description: Assignment joined with the Cars catalogue.
+      properties:
+        fleetId:
+          type: string
+        carId:
+          type: string
+        model:
+          type: string
+        brand:
+          type: string
+        prices:
+          type: number
+          format: double
+        pictureUrl:
+          type: string
+          nullable: true
+        assignedAt:
+          type: string
+          format: date-time
+      additionalProperties: true
+
+    # ---- Finance ---------------------------------------------------------
+    TransactionBody:
+      type: object
+      required: [amount, provider]
+      properties:
+        carId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional — non-car services have no vehicle.
+        amount:
+          type: number
+          format: double
+          description: Positive, at most 2 decimal places (DECIMAL(12,2) cap).
+        provider:
+          type: string
+          enum: [MPESA, CARD, ESCROW]
+    TransactionStatusBody:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [INITIATED, PENDING, HELD, RELEASED, REFUNDED, FAILED]
+    Transaction:
+      type: object
+      properties:
+        txId:
+          type: string
+          description: Server-generated uuid (never client-supplied).
+        userId:
+          type: string
+        carId:
+          type: string
+          nullable: true
+        amount:
+          type: number
+          format: double
+        provider:
+          type: string
+          enum: [MPESA, CARD, ESCROW]
+        status:
+          type: string
+          enum: [INITIATED, PENDING, HELD, RELEASED, REFUNDED, FAILED]
+        reference:
+          type: string
+          nullable: true
+          description: Payment-provider reference; reserved, never client-supplied.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      additionalProperties: true
+
+    # ---- Data ------------------------------------------------------------
+    AuditEntry:
+      type: object
+      properties:
+        logId:
+          type: string
+        actorUserId:
+          type: string
+          nullable: true
+          description: NULL = system-originated action.
+        action:
+          type: string
+          example: CAR_ADDED
+        entityType:
+          type: string
+          example: CAR
+        entityId:
+          type: string
+          nullable: true
+        metadata:
+          type: string
+          nullable: true
+          description: Optional JSON document (ISJSON-validated at write time).
+        createdAt:
+          type: string
+          format: date-time
+          description: UTC (SYSUTCDATETIME).
+
+    # ---- Typed envelopes (Envelope + typed data) -------------------------
+    LoginEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/LoginData'
+    UserListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserAccount'
+    CarEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Car'
+    CarListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Car'
+    CartItemEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              description: The upserted cart row, or null when the SP returns no row.
+              nullable: true
+              allOf:
+                - $ref: '#/components/schemas/CartItem'
+    CartItemListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/CartItem'
+    SellerProfileEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/SellerProfile'
+    SellerProfileListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/SellerProfile'
+    PassportEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Passport'
+    PassportEventEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/PassportEvent'
+    PassportBundleEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/PassportBundle'
+    MarketOverviewEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/MarketOverview'
+    BrandStatListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/BrandStat'
+    ValuationEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Valuation'
+    PartEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Part'
+    PartListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Part'
+    BookingEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Booking'
+    BookingListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Booking'
+    FleetEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Fleet'
+    FleetListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Fleet'
+    FleetVehicleEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              description: The removed assignment row, or null when nothing was removed (idempotent delete).
+              nullable: true
+              allOf:
+                - $ref: '#/components/schemas/FleetVehicle'
+    FleetVehicleListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/FleetVehicle'
+    TransactionEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Transaction'
+    TransactionListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+    AuditEntryListEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AuditEntry'
+
+  responses:
+    BadRequest:
+      description: Validation failed or malformed parameters (Joi message in `message`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing/malformed Authorization header, or invalid/expired token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Authenticated but not allowed (admin routes; non-owner resource access)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Requested resource does not exist (or unmatched route -> "Route not found")
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: State conflict (duplicate key or illegal state transition)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServerError:
+      description: Unexpected server error — details logged server-side only
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
