@@ -210,3 +210,32 @@ p {
   flex-direction: row;
   gap: 3rem;
 }
+
+/* ---- Registration page additions (task B-1) ---- */
+
+/* Let the submit button and any injected error line wrap below the columns. */
+form.row {
+  flex-wrap: wrap;
+}
+
+/* One-line password policy hint under the password field. */
+.hint {
+  width: 100%;
+  margin: 4px 0 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #6b7280;
+}
+
+/* Fallback styling for the <p class="form-error"> injected by ui.showFormError
+   (ui.js also applies inline styles, so this just keeps it consistent). */
+.form-error {
+  flex-basis: 100%;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-size: 14px;
+}
