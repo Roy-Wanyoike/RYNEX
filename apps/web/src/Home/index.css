@@ -294,3 +294,127 @@ font-size: 36px;
  .product-sale img{
   height: 150px;
  }
+
+/* ============================================================
+   RYNEX additions — hero CTA buttons + "How RYNEX protects
+   buyers" cards. Uses the existing palette (aquamarine accent,
+   dark background, red hover) via :root variables.
+   ============================================================ */
+
+:root {
+  --rynex-accent: aquamarine;
+  --rynex-accent-soft: rgba(127, 255, 212, 0.08);
+  --rynex-accent-border: rgba(127, 255, 212, 0.4);
+  --rynex-ink: #000;
+  --rynex-hover: red;
+}
+
+/* Hero CTA buttons */
+.intro-header .btn {
+  display: inline-block;
+  border-radius: 10px;
+  margin-top: 50px;
+  font-size: 24px;
+  height: 50px;
+  line-height: 46px;
+  width: 200px;
+  text-decoration: none;
+}
+.intro-header .btn + .btn {
+  margin-left: 20px;
+}
+.intro-header .btn-primary {
+  background-color: var(--rynex-accent);
+  border: 2px solid var(--rynex-accent);
+  color: var(--rynex-ink);
+  font-weight: 700;
+}
+.intro-header .btn-secondary {
+  background-color: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+}
+.intro-header .btn-primary:hover,
+.intro-header .btn-primary:active {
+  background-color: var(--rynex-hover);
+  border-color: var(--rynex-hover);
+  color: #fff;
+}
+.intro-header .btn-secondary:hover,
+.intro-header .btn-secondary:active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* "How RYNEX protects buyers" section */
+.protect {
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+}
+.protect h2 {
+  font-size: 2.25rem;
+  margin-bottom: 0.5rem;
+}
+.protect-sub {
+  font-size: 1.25rem;
+  color: #cfcfcf;
+}
+.protect-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 2.5rem auto 0;
+}
+.protect-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.75rem 1.5rem;
+  text-align: left;
+  text-decoration: none;
+  color: #fff;
+  background-color: var(--rynex-accent-soft);
+  border: 1px solid var(--rynex-accent-border);
+  border-radius: 0.5rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.protect-card:hover,
+.protect-card:focus-visible {
+  border-color: var(--rynex-accent);
+  transform: translateY(-3px);
+}
+.protect-card h3 {
+  color: var(--rynex-accent);
+  font-size: 1.4rem;
+}
+.protect-card p {
+  line-height: 1.5;
+  color: #e8e8e8;
+}
+.protect-cta {
+  margin-top: auto;
+  color: var(--rynex-accent);
+  font-weight: 600;
+}
+
+/* Cards/CTA responsive: stack below 768px */
+@media (max-width: 768px) {
+  .protect {
+    padding: 3rem 1.25rem 2rem;
+  }
+  .protect-cards {
+    grid-template-columns: 1fr;
+  }
+  .intro-header .btn + .btn {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .protect-card {
+    transition: none;
+  }
+  .protect-card:hover {
+    transform: none;
+  }
+}
