@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -50,6 +51,28 @@ app.use('/cart', cartRoute);
 
 // RYNEX versioned platform gateway (Trust, Passport, Intelligence, Parts,
 // Service, Fleet, Finance, Data). Modules self-register in Router/modules.
+// Version banner: every /api/v1 response advertises the API version.
+app.use('/api/v1', (_req, res, next) => {
+  res.setHeader('X-API-Version', 'v1');
+  next();
+});
+
+// OpenAPI 3 contract for the gateway, served straight from the service root.
+// path.resolve(__dirname, '../openapi.yaml') resolves to
+// <service-root>/openapi.yaml for BOTH layouts:
+//   - compiled:  dist/server.js   -> __dirname = <root>/dist -> ../ = <root>
+//   - in-place:  src/server.js    -> __dirname = <root>/src  -> ../ = <root>
+app.get('/api/v1/openapi.yaml', (_req, res) => {
+  try {
+    const spec = fs.readFileSync(path.resolve(__dirname, '../openapi.yaml'), 'utf8');
+    res.setHeader('Content-Type', 'text/yaml; charset=utf-8');
+    res.status(200).send(spec);
+  } catch (error) {
+    console.error('[openapi] failed to read openapi.yaml:', error);
+    res.status(500).json({ success: false, message: 'OpenAPI contract unavailable' });
+  }
+});
+
 app.use('/api/v1', modulesRouter);
 
 // 404 handler first, then the global error handler.
