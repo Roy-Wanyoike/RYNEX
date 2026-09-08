@@ -9,7 +9,37 @@
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="admin.css">
 
-    <title>Admin Dashboard</title>
+    <title>Add Cars — Admin Dashboard</title>
+
+    <style>
+        /* Page-local styling for the car catalogue table (admin.css is shared,
+           so additions for this page live here). */
+        #content main .table-data .order table th,
+        #content main .table-data .order table td {
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        #carList button.remove {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        #carList button.remove:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        #carList td.empty {
+            color: #6b7280;
+            font-style: italic;
+        }
+    </style>
 </head>
 
 <body>
@@ -60,40 +90,67 @@
                     <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
                 </div>
             </form>
-            </a>
 
         </nav>
 
         <main>
-            <div class="addUser">
+            <div class="addUser" id="adminCarsPanel">
                 <h2>Add Cars</h2> <br>
-                <form action="" class="row" id="formCars">
 
-
+                <!-- Add-car form: ids match the POST /products contract
+                     (model, bodyType, brand, prices, pictureUrl).
+                     novalidate keeps validation in addCars.js so errors render
+                     via ui.showFormError. -->
+                <form action="#" class="row" id="formCars" novalidate>
                     <div class="column">
                         <label for="model">Car Model</label>
-                        <input type="text" id="carModel">
+                        <input type="text" id="model" name="model" placeholder="e.g. Mazda MX-5" autocomplete="off">
 
-                        <label for="bodytype">Body Type</label>
-                        <input type="text" id="bodyType">
+                        <label for="bodyType">Body Type</label>
+                        <input type="text" id="bodyType" name="bodyType" placeholder="e.g. Sedan" autocomplete="off">
 
                         <label for="brand">Brand</label>
-                        <input type="text" id="brand">
+                        <input type="text" id="brand" name="brand" placeholder="e.g. Mazda" autocomplete="off">
 
-                        <label for="price">Price</label>
-                        <input type="text" id="price">
+                        <label for="prices">Price</label>
+                        <input type="number" id="prices" name="prices" step="0.01" min="0.01" placeholder="e.g. 2500000"
+                            autocomplete="off">
 
-                        <label for="picture">Picture</label>
-                        <input type="file" id="image">
-
+                        <label for="pictureUrl">Picture URL</label>
+                        <input type="text" id="pictureUrl" name="pictureUrl"
+                            placeholder="https://example.com/car.jpg" autocomplete="off">
                     </div>
 
+                    <button type="submit" class="reg" id="addCarBtn">Add Car</button>
                 </form>
-                <Button class="reg" id="addCarBtn">Add Car</Button>
-                <Button class="delete" id="delCar">Delete</Button>
+
+                <!-- Car catalogue: rendered by addCars.js into #carListBody -->
+                <div class="table-data">
+                    <div class="order">
+                        <div class="head">
+                            <h3>Car Catalogue</h3>
+                        </div>
+                        <table id="carList">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Brand</th>
+                                    <th>Body Type</th>
+                                    <th>Price</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody id="carListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </main>
     </section>
-    <script src="../../dist/Admin/addCars.js"></script>
+
+    <!-- Load order matters: api.js -> ui.js -> page script -->
+    <script src="../api/api.js"></script>
+    <script src="../api/ui.js"></script>
+    <script src="./addCars.js"></script>
 </body>
 </html>
