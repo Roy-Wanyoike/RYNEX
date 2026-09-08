@@ -1,4 +1,11 @@
-// DUMMY PRODUCTS (PRODUCT ID : DATA)
+// RYNEX — FALLBACK DEMO CATALOGUE (PRODUCT ID : DATA)
+// ---------------------------------------------------------------------------
+// Used ONLY when the server catalogue (GET /products/getproducts) cannot be
+// reached: cart.js replaces this map with live server rows on success.
+// Rules: numeric prices only, unique numeric keys, and every img file must
+// exist in src/cart/images/. (Junk demo entries removed; the duplicated key
+// 133 was renumbered to 135.)
+// ---------------------------------------------------------------------------
 let products = {
   123: {
     name : "Audi A4 2020",
@@ -26,12 +33,12 @@ let products = {
     price : 2800000
   },
   128: {
-    name : "JEEP G-wagon 2021",
+    name : "Jeep Wrangler 2021",
     img : "jeep.jpg",
     price : 5500000
   },
   129: {
-    name : "mazda CX5 2016",
+    name : "Mazda CX5 2016",
     img : "mazdacx5.jpg",
     price : 1500000
   },
@@ -40,29 +47,14 @@ let products = {
     img : "mazdamx5.jpg",
     price : 2500000
   },
-  131: {
-    name : "Volkswagen Touareg",
-    img : "volkswagen.png",
-    price : 2500000
-  },
   132: {
-    name: "Volkswagen Passat",
-    img: "vwred.jpg",
-    price: "2400000"
+    name : "Volkswagen Passat",
+    img : "vwred.png",
+    price : 2400000
   },
-  133: {
-    name: "Volkswagen Hunter",
-    img: "vwToureg.jpg",
-    price: "1900000"
-  },
-  134: {
-    name: "iphone xs",
-    img: "JS-CART-1.png",
-    price: "190000"
-  },
-  133: {
-    name: "google pixel 7a",
-    img: "JS-CART-2.png",
-    price: "90000"
-  },
+  135: {
+    name : "Volkswagen Touareg V6",
+    img : "vwToureg.jpg",
+    price : 1900000
+  }
 };
